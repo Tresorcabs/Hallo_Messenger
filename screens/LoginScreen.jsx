@@ -9,7 +9,7 @@ export default function LoginScreen() {
 
     const navigation = useNavigation();
 
-    const { showPassword, setShowPassword } = useState(false);
+    const [ showPassword, setShowPassword ] = useState(false);
     return (
         <View className="flex-col items-center w-full h-full bg-primary">
 
