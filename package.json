@@ -9,10 +9,25 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@material-tailwind/react": "^2.1.9",
+    "@react-native-community/datetimepicker": "^8.0.1",
+    "@react-navigation/native": "^6.1.17",
+    "@react-navigation/native-stack": "^6.10.0",
+    "autoprefixer": "^10.4.19",
+    "babel-plugin-module-resolver": "^5.0.2",
     "expo": "~51.0.20",
     "expo-status-bar": "~1.12.1",
+    "nativewind": "^2.0.11",
+    "postcss": "^8.4.39",
     "react": "18.2.0",
-    "react-native": "0.74.3"
+    "react-native": "0.74.3",
+    "react-native-gesture-handler": "^2.16.1",
+    "react-native-phone-input": "^1.3.7",
+    "react-native-picker-select": "^9.1.3",
+    "react-native-reanimated": "^3.10.1",
+    "react-native-vector-icons": "^10.1.0",
+    "tailwind-merge": "^2.4.0",
+    "tailwindcss": "^3.3.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"
