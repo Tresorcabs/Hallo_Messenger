@@ -1,4 +1,4 @@
-import { View, Text, Button, Image, TouchableOpacity, TextInput, Platform } from 'react-native';
+import { View, Text, Button, Image, TouchableOpacity, TextInput, Platform, TouchableWithoutFeedback } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import Animated, { FadeIn, FadeInDown, FadeInUp, FadeOut } from 'react-native-reanimated';
 import 'react-native-gesture-handler';
@@ -8,6 +8,7 @@ import React, { useState } from 'react';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import RNPickerSelect from 'react-native-picker-select';
 import ReactNativePhoneInput from 'react-native-phone-input';
+import { Keyboard } from 'react-native';
 
 
 export default function SignUpScreen1() {
@@ -41,6 +42,7 @@ export default function SignUpScreen1() {
     const navigation = useNavigation();
 
     return (
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View className="flex-col items-center w-full h-full bg-primary">
             <Animated.View entering={FadeInUp.delay(150).duration(1000).springify()} className="flex-row items-center content-center w-full gap-10 h-1/6" style={{marginVertical: 20, marginTop:10}}>
             <TouchableOpacity onPress={() => navigation.goBack()} style={{paddingHorizontal: 25, paddingVertical: 5}}>
@@ -89,10 +91,10 @@ export default function SignUpScreen1() {
                     </Animated.View>
 
                     {/** gender selector */}
-                    <Animated.View entering={FadeInUp.delay(600).duration(1000).springify()} className="w-4/5 m-5 border-primary-200 rounded-xl placeholder:text-behind-input" style={{ borderWidth: 1 }}>
+                    <View className="w-4/5 m-5 border-primary-200 rounded-xl placeholder:text-behind-input" style={{ borderWidth: 1 }}>
 
-                        <RNPickerSelect  placeholder={{ label: 'Sexe', value: null, color: '#0C7E47', }} style={{ inputAndroid: { color: '#0C7E47' }, inputIOS: { color: '#0C7E47' }}} onValueChange={(value) => setGender(value)} items={genders} />
-                    </Animated.View>
+                        <RNPickerSelect  placeholder={{ label: 'Sexe', value: null, color: '#0C7E47', }} style={{ inputAndroid: { color: '#0C7E47', height: 50 }, inputIOS: { color: '#0C7E47', height: 50 }}} onValueChange={(value) => setGender(value)} items={genders} />
+                    </View>
                 </View>
 
                 {/** Action Buttons */}
@@ -110,5 +112,6 @@ export default function SignUpScreen1() {
             </Animated.View>
 
         </View>
+        </TouchableWithoutFeedback>
     );
 }

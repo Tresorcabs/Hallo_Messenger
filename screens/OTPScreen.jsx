@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, TextInput, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, StyleSheet, Keyboard, TouchableWithoutFeedback } from 'react-native';
 import Animated, { FadeIn, FadeInDown, FadeInUp, FadeOut } from 'react-native-reanimated';
 import 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
@@ -7,7 +7,7 @@ import React, { useState ,useRef } from 'react';
 import { input } from '@material-tailwind/react';
 
 
-export default function SignUpScreen1() {
+export default function OTPScreen() {
 
     const navigation = useNavigation();
 
@@ -43,6 +43,7 @@ export default function SignUpScreen1() {
 
 
     return (
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View className="flex-col items-center w-full h-full bg-primary">
 
             <Animated.View entering={FadeInUp.delay(150).duration(1000).springify()} className="flex-row items-center content-center w-full gap-10 h-1/6" style={{ marginVertical: 20, marginTop: 10 }}>
@@ -52,7 +53,7 @@ export default function SignUpScreen1() {
                 <Text className="text-2xl font-bold text-white " >Inscription ( Etape 3 / 5)</Text>
             </Animated.View>
 
-            {/** signUP  Form 1 */}
+            {/** signUP  Form 3 */}
             <Animated.View entering={FadeInDown.delay(250).duration(5000).springify()} className="flex-col items-center content-center justify-between w-full pt-16 pb-16 bg-white rounded-l-3xl h-5/6" style={{ borderTopLeftRadius: 70, borderTopRightRadius: 70, shadowColor: "#000" }}>
                 {/** Inputs view */}
                 <View className="flex-col items-center content-center w-full">
@@ -94,10 +95,10 @@ export default function SignUpScreen1() {
                 {/** Action Buttons */}
                 <View className="flex items-center content-center justify-center w-full h-1/3">
 
-                    {/** Action Buttons : se connecter*/}
+                    {/** Action Buttons : Continuer */}
                     <Animated.View entering={FadeInUp.delay(250).duration(1000).springify()} className="items-center justify-center w-full pl-8 pr-8 ">
-                        <TouchableOpacity className="w-4/5 p-3 m-5 bg-primary rounded-xl" onPress={() => navigation.navigate('SignUp2')} >
-                            <Text className="font-bold text-center text-white">Vérifier mon numéro       <Icon name="arrow-right" size={15} color="white" /> </Text>
+                        <TouchableOpacity className="w-4/5 p-3 m-5 bg-primary rounded-xl" onPress={() => navigation.navigate('ProfileScreen')} >
+                            <Text className="font-bold text-center text-white">Vérifier        <Icon name="arrow-right" size={15} color="white" /> </Text>
                         </TouchableOpacity>
                     </Animated.View>
 
@@ -106,6 +107,7 @@ export default function SignUpScreen1() {
             </Animated.View>
 
         </View>
+        </TouchableWithoutFeedback>
     );
 }
 
