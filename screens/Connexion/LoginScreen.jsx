@@ -1,14 +1,18 @@
-import { View, Text, Button, Image, TouchableOpacity, TextInput, Keyboard, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, Button, Image, TouchableOpacity, TextInput, Keyboard, TouchableWithoutFeedback, StyleSheet } from 'react-native';
 import Animated, { FadeIn, FadeInDown, FadeInUp, FadeOut } from 'react-native-reanimated';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useState } from 'react';
-import colors from '../components/colors';
+import colors from '../../components/colors';
+import RNPickerSelect from 'react-native-picker-select';
+import countryData from '../../components/data/country.json'
 
 export default function LoginScreen() {
 
     const navigation = useNavigation();
 
+    const [ dialCode, setDialCode ] = useState(null)
+    
     const handleNavigateToHome = () => {
         navigation.navigate('Home');
     };
@@ -26,20 +30,34 @@ export default function LoginScreen() {
             </Animated.View>
 
             {/** Login  Form 1 */}
-            <Animated.View entering={FadeInDown.delay(250).duration(5000).springify()} className="flex-col items-center content-center justify-between w-full pt-16 pb-16 bg-white rounded-l-3xl h-5/6" style={{ borderTopLeftRadius: 70, borderTopRightRadius: 70, shadowColor: "#000" }}>
+            <Animated.View entering={FadeInDown.delay(250).duration(5000).springify()} className="flex-col items-center content-center w-full pt-16 bg-white rounded-l-3xl h-5/6" style={{ borderTopLeftRadius: 70, borderTopRightRadius: 70, shadowColor: "#000" }}>
+                
+                {/** Inputs View */}
+                <View className="flex-col w-full pb-14">
                 {/** Phone Input */}
-                <Animated.View entering={FadeInUp.delay(200).duration(1000).springify()} className="items-center content-center w-full ">
-                    <TextInput className="w-4/5 p-3 m-5 border-primary-200 rounded-xl placeholder:text-behind-input" style={{ borderWidth: 1 }} placeholder="Numéro de téléphone" keyboardType='numeric'></TextInput>
+
+                <Animated.View entering={FadeInUp.delay(200).duration(1000).springify()} className="flex-row items-center justify-center w-full">
+                    <View className='absolute mr-5 left-11 rounded-tl-xl rounded-bl-xl border-r-primary' style={{width: 138, borderRightWidth: 1, zIndex: 100}}>
+                        <RNPickerSelect placeholder={ {label:'+237' , value:null, color:colors.behind_input} } 
+                        onValueChange={(value) => setDialCode(value)}
+                        items={countryData.map((country) => ({
+                            label: country.flag + '  ' + country.dial_code,
+                            key: country.code,
+                            value: country.name
+                        }) )}
+                        />
+                    </View>
+                    <TextInput className="w-4/5 p-3 m-5 pl-36 border-primary-200 rounded-xl placeholder:text-behind-input " style={styles.input} placeholder="Numéro de téléphone" keyboardType='numeric'></TextInput>
                 </Animated.View>
 
                 {/** Login Input */}
                 <Animated.View entering={FadeInUp.delay(400).duration(1000).springify()} className="items-center content-center w-full ">
-                    <TextInput className="w-4/5 p-3 m-5 border-primary-200 rounded-xl placeholder:text-behind-input" style={{ borderWidth: 1 }} placeholder="Login"></TextInput>
+                    <TextInput className="w-4/5 p-3 m-5 border-primary-200 rounded-xl placeholder:text-behind-input" style={styles.input} placeholder="Nom d'utilisateur"></TextInput>
                 </Animated.View>
 
                 {/** Password Input */}
                 <Animated.View entering={FadeInUp.delay(600).duration(1000).springify()} className="flex-col items-center content-center justify-center w-full ">
-                    <TextInput className="w-4/5 p-3 m-5 text-sm border-primary-200 rounded-xl placeholder:text-behind-input" style={{ borderWidth: 1 }} placeholder="Password" secureTextEntry={!showPassword}>
+                    <TextInput className="w-4/5 p-3 m-5 border-primary-200 rounded-xl placeholder:text-behind-input" style={styles.input} placeholder="Mot de passe" secureTextEntry={!showPassword}>
                     </TextInput>
                     <Icon
                         style={{ position: 'absolute', right: 60 }}
@@ -49,6 +67,7 @@ export default function LoginScreen() {
                         onPress={() => setShowPassword(!showPassword)}
                     />
                 </Animated.View>
+                </View>
 
                 {/** Action Buttons */}
                 <View className="flex items-center content-center justify-center w-full h-1/3">
@@ -80,3 +99,10 @@ export default function LoginScreen() {
         </TouchableWithoutFeedback>
     )
 }
+
+const styles = StyleSheet.create({
+    input: {
+        fontSize: 15,
+        borderWidth: 1
+    }
+})

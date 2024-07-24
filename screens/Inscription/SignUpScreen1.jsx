@@ -33,12 +33,6 @@ export default function SignUpScreen1() {
         { label: 'Autre', value: 'Autre' },
     ];
 
-    const countries = [
-        { label: 'Cameroun', value: 'cmr' },
-        { label: 'Senegal', value: 'sng' }
-
-    ]
-
     const navigation = useNavigation();
 
     return (
@@ -56,7 +50,7 @@ export default function SignUpScreen1() {
                 {/** Inputs view */}
                 <View className="flex-col items-center content-center w-full">
                     {/** Name and surname Input */}
-                    <View className="flex flex-row w-4/5 m-5">
+                    <View className="flex-row w-4/5 m-5">
                         {/** Name Input */}
                         <Animated.View entering={FadeInUp.delay(200).duration(1000).springify()} className="w-1/2">
                             <TextInput className="p-3 border-primary-200 rounded-xl placeholder:text-behind-input" placeholder="Nom" style={{ borderWidth: 1, width: "95%" }}></TextInput>
