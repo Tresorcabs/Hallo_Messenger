@@ -1,4 +1,4 @@
-import { View, Text, Button, Image, TouchableOpacity, TextInput, Platform, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, Button, Image, TouchableOpacity, TextInput, Platform, TouchableWithoutFeedback, ScrollView } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import Animated, { FadeIn, FadeInDown, FadeInUp, FadeOut } from 'react-native-reanimated';
 import 'react-native-gesture-handler';
@@ -47,6 +47,7 @@ export default function SignUpScreen1() {
 
             {/** signUP  Form 1 */}
             <Animated.View entering={FadeInDown.delay(250).duration(5000).springify()} className="flex-col items-center content-center justify-between w-full pt-16 pb-16 bg-white rounded-l-3xl h-5/6" style={{ borderTopLeftRadius: 70, borderTopRightRadius: 70, shadowColor: "#000" }}>
+                <ScrollView showsVerticalScrollIndicator={false}>
                 {/** Inputs view */}
                 <View className="flex-col items-center content-center w-full">
                     {/** Name and surname Input */}
@@ -91,6 +92,8 @@ export default function SignUpScreen1() {
                     </View>
                 </View>
 
+                </ScrollView>
+                
                 {/** Action Buttons */}
                 <View className="flex items-center content-center justify-center w-full h-1/3">
 
@@ -102,7 +105,6 @@ export default function SignUpScreen1() {
                     </Animated.View>
 
                 </View>
-
             </Animated.View>
 
         </View>

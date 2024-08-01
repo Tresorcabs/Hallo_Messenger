@@ -7,6 +7,7 @@ import {
     TextInput,
     Keyboard,
     TouchableWithoutFeedback,
+    ScrollView
 } from "react-native";
 import Animated, {
     FadeIn,
@@ -62,6 +63,8 @@ return (
         shadowColor: "#000",
         }}
     >
+
+<ScrollView showsVerticalScrollIndicator={false} style={{width: "95%"}}>
         {/** Inputs view */}
         <View className="flex-col items-center content-center w-full">
         {/** Login Input */}
@@ -112,6 +115,8 @@ return (
         {/**Accept terms and conditions */}
         </View>
 
+            </ScrollView>
+
         {/** Action Buttons */}
         <View className="flex items-center content-center justify-center w-full h-1/3">
         {/** Action Buttons : se connecter*/}
@@ -121,7 +126,7 @@ return (
         >
             <TouchableOpacity
             className="w-full p-3 m-5 bg-primary rounded-xl"
-            onPress={() => navigation.navigate("SignUpFinal")}
+            onPress={() => navigation.replace("SignUpFinal")}
             >
             <Text className="font-bold text-center text-white">
                 Continuer <Icon name="arrow-right" size={15} color="white" />{" "}

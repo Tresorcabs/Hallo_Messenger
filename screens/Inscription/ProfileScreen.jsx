@@ -8,6 +8,7 @@ import {
   Platform,
   Keyboard,
   TouchableWithoutFeedback,
+  ScrollView
 } from "react-native";
 import Animated, {
   FadeIn,
@@ -21,6 +22,8 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import React, { useState } from "react";
 import colors from "../../components/colors";
 import * as ImagePicker from "expo-image-picker";
+import placeholderAvatar from "../../assets/placeholder_avatar.png";
+import profil1 from '../../assets/profil1.jpg';
 
 export default function ProfileScreen() {
   const navigation = useNavigation();
@@ -87,62 +90,66 @@ export default function ProfileScreen() {
             shadowColor: "#000",
           }}
         >
-          {/** Inputs view */}
-          <View className="flex-col items-center content-center w-full">
-            {/** Profile text */}
-            <Animated.View
-              entering={FadeInUp.delay(300).duration(1000).springify()}
-              className="flex-row items-center content-center justify-center w-full m-5"
-            >
-              <Text className="text-lg text-center text-primary">
-                Sélectionnez une photo de profil
-              </Text>
-            </Animated.View>
 
-            {/** Profile selector  */}
-            <Animated.View
-              entering={FadeInUp.delay(400).duration(1000).springify()}
-              className="items-center content-center w-full "
-            >
-              <View
-                className="p-3 m-5 rounded-full bg-secondary-btn-bg border-primary-200"
-                style={{ borderWidth: 1 }}
+          <ScrollView showsVerticalScrollIndicator={false} style={{ width: "95%" }}>
+            {/** Inputs view */}
+            <View className="flex-col items-center content-center w-full">
+              {/** Profile text */}
+              <Animated.View
+                entering={FadeInUp.delay(300).duration(1000).springify()}
+                className="flex-row items-center content-center justify-center w-full m-5"
               >
-                {/*placeholder image */}
-                {image ? (
-                  <Image
-                    source={{ uri: image }}
-                    className="w-40 h-40 rounded-full"
-                  />
-                ) : (
-                  <Image
-                    source={require("../../assets/images/placeholder_avatar.png")}
-                    className="w-40 h-40 rounded-full"
-                  />
-                )}
+                <Text className="text-lg text-center text-primary">
+                  Sélectionnez une photo de profil
+                </Text>
+              </Animated.View>
 
-                <TouchableOpacity
-                  className="absolute bottom-0 p-3 rounded-full right-2 bg-primary"
-                  onPress={pickImage}
+              {/** Profile selector  */}
+              <Animated.View
+                entering={FadeInUp.delay(400).duration(1000).springify()}
+                className="items-center content-center w-full "
+              >
+                <View
+                  className="p-3 m-5 rounded-full bg-secondary-btn-bg border-primary-200"
+                  style={{ borderWidth: 1 }}
                 >
-                  <Icon name="camera" size={20} color="white" />
-                </TouchableOpacity>
-              </View>
-            </Animated.View>
+                  {/*placeholder image */}
+                  {image ? (
+                    <Image
+                      source={{ uri: image }}
+                      className="w-40 h-40 rounded-full"
+                    />
+                  ) : (
+                    <Image
+                      source={profil1}
+                      className="w-40 h-40 rounded-full"
+                    />
+                  )}
 
-            {/** Memo Input */}
-            <Animated.View
-              entering={FadeInUp.delay(400).duration(1000).springify()}
-              className="items-center content-center w-full "
-            >
-              <TextInput
-                className="w-4/5 p-3 m-5 border-primary-200 rounded-xl placeholder:text-behind-input"
-                style={{ borderWidth: 1 }}
-                placeholder="Saisissez votre mémo"
-                multiline={true}
-              ></TextInput>
-            </Animated.View>
-          </View>
+                  <TouchableOpacity
+                    className="absolute bottom-0 p-3 rounded-full right-2 bg-primary"
+                    onPress={pickImage}
+                  >
+                    <Icon name="camera" size={20} color="white" />
+                  </TouchableOpacity>
+                </View>
+              </Animated.View>
+
+              {/** Memo Input */}
+              <Animated.View
+                entering={FadeInUp.delay(400).duration(1000).springify()}
+                className="items-center content-center w-full "
+              >
+                <TextInput
+                  className="w-4/5 p-3 m-5 border-primary-200 rounded-xl placeholder:text-behind-input"
+                  style={{ borderWidth: 1 }}
+                  placeholder="Saisissez votre mémo"
+                  multiline={true}
+                ></TextInput>
+              </Animated.View>
+            </View>
+
+          </ScrollView>
 
           {/** Action Buttons */}
           <View className="flex items-center content-center justify-center w-full h-1/3">
@@ -156,8 +163,8 @@ export default function ProfileScreen() {
                 onPress={() => navigation.navigate("SignUp5")}
               >
                 <Text className="font-bold text-center text-white">
-                  Vérifier mon numéro{" "}
-                  <Icon name="arrow-right" size={15} color="white" />{" "}
+                  Continuer  {"    "}
+                  <Icon name="arrow-right" size={15} color="white" />
                 </Text>
               </TouchableOpacity>
             </Animated.View>

@@ -22,6 +22,8 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "description": "App de messagerie",
+    "assetBundlePatterns": ["**/*"]
   }
 }

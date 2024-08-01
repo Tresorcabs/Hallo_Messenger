@@ -8,6 +8,7 @@ import {
   Platform,
   Keyboard,
   TouchableWithoutFeedback,
+  ScrollView
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import Animated, {
@@ -28,7 +29,7 @@ import colors from "../../components/colors";
 
 export default function SignUpScreen2() {
   const [country, setCountry] = useState(null);
-  const [countryDialCode, setCountryDialCode] = useState("");
+  const [countryDialCode, setCountryDialCode] = useState("+ 237 600 000 000");
   const [phone, setPhone] = useState(null);
   const [show, setShow] = useState(false);
 
@@ -74,6 +75,8 @@ export default function SignUpScreen2() {
             shadowColor: "#000",
           }}
         >
+          
+          <ScrollView showsVerticalScrollIndicator={false} style={{width: "95%"}}>
           {/** Inputs view */}
           <View className="flex-col items-center content-center w-full">
             {/** country selector */}
@@ -110,6 +113,7 @@ export default function SignUpScreen2() {
             </Animated.View>
           </View>
 
+          </ScrollView>
           {/** Action Buttons */}
           <View className="flex items-center content-center justify-center w-full h-1/3">
             {/** Action Buttons : vérifier mon numéro*/}
