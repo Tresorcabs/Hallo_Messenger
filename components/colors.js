@@ -11,7 +11,10 @@ const colors = {
     pureWhite: '#fff',
     pureBlack: '#131415',
 
-    smokeBlack: '#242424'
+    smokeBlack: '#242424',
+
+    statutIndicator: "#53E04E",
+    statutIndicatorBorder: '#556581'
 };
 
 export default colors;

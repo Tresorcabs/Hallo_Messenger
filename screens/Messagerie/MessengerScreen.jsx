@@ -20,11 +20,11 @@ function MessengerScreen() {
   return (
 
     <Tab.Navigator
-      screenOption={{ headerShown: false }}
+
       shifting={true}
       activeIndicatorStyle={{ backgroundColor: colors.secondary_btn_bg }}
       activeColor={colors.secondary_btn_bg}
-      barStyle={{ backgroundColor: colors.primary, position: 'absolute', bottom: 0, height: 70, borderTopLeftRadius: 50, borderTopRightRadius: 50, elevation: 5 }}
+      barStyle={{ backgroundColor: "red", bottom: 0, height: "8%", borderTopLeftRadius: 50, borderTopRightRadius: 50, elevation: 5 }}
     >
       {
         TabArr.map((item, index) => {

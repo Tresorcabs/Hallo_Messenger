@@ -24,6 +24,14 @@
       "favicon": "./assets/favicon.png"
     },
     "description": "App de messagerie",
-    "assetBundlePatterns": ["**/*"]
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "474e2e3b-fc01-41e5-98fc-0a880121843c"
+      }
+    },
+    "owner": "tresorcabs"
   }
 }
