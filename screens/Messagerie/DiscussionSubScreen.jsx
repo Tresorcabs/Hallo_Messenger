@@ -1,4 +1,4 @@
-import { View, Text, Image, TextInput, TouchableOpacity, ScrollView, FlatList, Keyboard, Pressable, Dimensions } from 'react-native'
+import { View, Text, Image, TextInput, TouchableOpacity, ScrollView, FlatList, Keyboard, Pressable, Dimensions, Platform } from 'react-native'
 import React, { useState, useRef, useCallback } from 'react';
 import Animated, {
   FadeIn,
@@ -177,7 +177,9 @@ export default function DiscussionSubScreen() {
 
 
             {/** Header */}
-            <View className="flex-row items-center content-center justify-between w-full " style={{ height: "10%", paddingHorizontal: 15, marginTop: 20, marginBottom: -10, backgroundColor: colors.smokeBlack }}>
+            <View className="flex-row items-center content-center justify-between w-full " style={
+              Platform.OS == "ios" ? { height: "10%", paddingHorizontal: 15, marginTop: "5%", marginBottom: -10 }
+                : { height: "10%", paddingHorizontal: 15, marginTop: "5%", marginBottom: -10 }}>
               <Text className="font-bold text-white " style={{ fontSize: 28 }}>
                 Hallo Messenger
               </Text>
@@ -200,15 +202,26 @@ export default function DiscussionSubScreen() {
             {/** Discussions container */}
             <Animated.View
               entering={FadeInDown.delay(250).duration(5000).springify()}
-              className="flex-col items-center content-center justify-between w-full pt-6 pb-4 bg-white"
-              style={{
-                borderTopLeftRadius: 30,
-                borderTopRightRadius: 30,
-                width: "98%",
-                height: "95%",
-                shadowColor: "#000",
-                zIndex: -100,
-              }}
+              className="flex-col items-center content-center justify-between w-full pt-6 pb-2 bg-white"
+              style={
+                Platform.OS == "android" ?
+                  {
+                    borderTopLeftRadius: 30,
+                    borderTopRightRadius: 30,
+                    width: "98%",
+                    height: "90%",
+                    shadowColor: "#000",
+                    zIndex: -100,
+                  }
+                  : {
+                    borderTopLeftRadius: 30,
+                    borderTopRightRadius: 30,
+                    width: "98%",
+                    height: "90%",
+                    shadowColor: "#000",
+                    zIndex: -100,
+                  }
+              }
             >
 
 

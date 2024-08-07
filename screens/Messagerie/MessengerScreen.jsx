@@ -5,6 +5,7 @@ import EnterpriseScreen from './EnterpriseScreen'
 import SpotScreen from './SpotScreen';
 import colors from '../../components/colors';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { Platform } from 'react-native';
 
 const Tab = createMaterialBottomTabNavigator();
 
@@ -24,7 +25,8 @@ function MessengerScreen() {
       shifting={true}
       activeIndicatorStyle={{ backgroundColor: colors.secondary_btn_bg }}
       activeColor={colors.secondary_btn_bg}
-      barStyle={{ backgroundColor: "red", bottom: 0, height: "8%", borderTopLeftRadius: 50, borderTopRightRadius: 50, elevation: 5 }}
+      barStyle={Platform.OS === "android" ? { backgroundColor: colors.primary, bottom: 0, height: "9%", borderTopLeftRadius: 50, borderTopRightRadius: 50, elevation: 5 }
+        : { backgroundColor: colors.primary, bottom: 0, height: "10%", borderTopLeftRadius: 50, borderTopRightRadius: 50 }}
     >
       {
         TabArr.map((item, index) => {

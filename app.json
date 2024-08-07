@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Hallo_Messenger",
-    "slug": "Hallo_Messenger",
+    "slug": "hallo-messenger",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -18,7 +18,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.tresorcabs.hallomessenger"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -32,6 +33,12 @@
         "projectId": "474e2e3b-fc01-41e5-98fc-0a880121843c"
       }
     },
-    "owner": "tresorcabs"
+    "owner": "tresorcabs",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/474e2e3b-fc01-41e5-98fc-0a880121843c"
+    }
   }
 }
