@@ -14,7 +14,10 @@ const colors = {
     smokeBlack: '#242424',
 
     statutIndicator: "#53E04E",
-    statutIndicatorBorder: '#556581'
+    statutIndicatorBorder: '#556581',
+
+    redAlert: '#E72929',
+    alertButtonBg: '#FFE4CF'
 };
 
 export default colors;

@@ -5,7 +5,8 @@ import colors from '../../../components/colors';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { StatusBar } from 'expo-status-bar';
 import placeholderImage from '../../../assets/placeholder_avatar.png';
-
+import MenuActionBar from '../../../components/MenuActionBar';
+import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 
 
 
@@ -44,10 +45,10 @@ const messagesData = {
 
 // Option pour le menu
 const menuOptions = [
-    { text: 'Répondre', icon: 'arrow-undo-outline', onPress: () => console.log('Répondre') },
-    { text: 'Transférer', icon: 'arrow-redo-outline', onPress: () => console.log('Transférer') },
-    { text: 'Supprimer', icon: 'trash-outline', onPress: () => console.log('Supprimer') },
-    { text: 'Modifier', icon: 'create-outline', onPress: () => console.log('Modifier') },
+    { text: 'Répondre', icon: 'arrow-undo', onPress: () => console.log('Répondre') },
+    { text: 'Transférer', icon: 'arrow-redo', onPress: () => console.log('Transférer') },
+    { text: 'Supprimer', icon: 'trash', onPress: () => console.log('Supprimer') },
+    { text: 'Modifier', icon: 'create', onPress: () => console.log('Modifier') },
 ];
 
 
@@ -80,14 +81,16 @@ const ChatScreen = () => {
 
     // ----------------- Gestion du menu ----------------------- \\
     const [isMenuVisible, setIsMenuVisible] = useState(false);
-    const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
+    const [menuPosition, setMenuPosition] = useState({ top: 0, right: 0 });
     const [selectedMessage, setSelectedMessage] = useState(null);
 
-    const handleLongPress = (message) => {
+    const handleLongPress = (event, message) => {
+        const { pageY } = event.nativeEvent;
+        // position du menu
+        setMenuPosition({ top: pageY - 80, right: 10 });
         setSelectedMessage(message);
-        // position du message
-
-        setMenuPosition({ top: 10, left: 10 });
+        // mettre un backgroundColor sur le message sélectionné à travers le paramètre messageContainer
+        // à venir
         setIsMenuVisible(true);
     }
 
@@ -102,7 +105,7 @@ const ChatScreen = () => {
 
     // ----------------- Gestion des messages ----------------------- \\ 
     const renderMessage = ({ item }) => (
-        <TouchableOpacity ref={messageRef} style={[styles.messageContainer, item.isSent ? styles.sentMessage : styles.receivedMessage]} onLongPress={() => handleLongPress(messageRef.current)} >
+        <TouchableOpacity ref={messageRef} style={[styles.messageContainer, item.isSent ? styles.sentMessage : styles.receivedMessage]} onLongPress={(event) => handleLongPress(event, item)} delayLongPress={500}>
             <Text style={item.isSent ? styles.messageSendText : styles.messageReceivedText}>{item.text}</Text>
             <Text style={item.isSent ? styles.timestampSendText : styles.timestampReceivedText}>{item.timestamp}</Text>
         </TouchableOpacity>
@@ -174,98 +177,90 @@ const ChatScreen = () => {
         >
 
             <StatusBar style="light" />
+            <View style={styles.container} onPress={() => { Keyboard.dismiss(); handleCloseMenu() }}>
+                {/** Header du chat */}
+                <View style={styles.header}>
 
-            {/** Header du chat */}
-            <View style={styles.header}>
+                    <View style={styles.headerContainer}>
+                        {/** Bouton de retour */}
+                        <TouchableOpacity style={styles.backButton}>
+                            <Icon name="arrow-back" size={30} color={colors.pureWhite} onPress={() => navigation.goBack()} />
+                        </TouchableOpacity>
 
-                <View style={styles.headerContainer}>
-                    {/** Bouton de retour */}
-                    <TouchableOpacity style={styles.backButton}>
-                        <Icon name="arrow-back" size={30} color={colors.pureWhite} onPress={() => navigation.goBack()} />
-                    </TouchableOpacity>
+                        {/** Profil image */}
+                        <TouchableOpacity style={styles.profileImageContainer}>
+                            {profile ?
+                                <Image source={profile} style={styles.profileImage} />
+                                : <Image source={placeholderImage} style={styles.profileImage} />
+                            }
+                            {/** Indicateur de  Statut du contact */}
+                            <View style={[styles.statusIndicator, { backgroundColor: statut === "En ligne" ? colors.statutIndicator : "grey", }]} />
+                        </TouchableOpacity>
 
-                    {/** Profil image */}
-                    <TouchableOpacity style={styles.profileImageContainer}>
-                        {profile ?
-                            <Image source={profile} style={styles.profileImage} />
-                            : <Image source={placeholderImage} style={styles.profileImage} />
-                        }
-                        {/** Indicateur de  Statut du contact */}
-                        <View style={[styles.statusIndicator, { backgroundColor: statut === "En ligne" ? colors.statutIndicator : "grey", }]} />
-                    </TouchableOpacity>
+                        <View style={styles.headerTextContainer}>
+                            {/** Nom du contact */}
+                            <Text style={styles.ContactName}>{nom === "" ? phoneNumber : nom}</Text>
 
-                    <View style={styles.headerTextContainer}>
-                        {/** Nom du contact */}
-                        <Text style={styles.ContactName}>{nom === "" ? phoneNumber : nom}</Text>
+                            {/** Statut du contact */}
+                            <Text style={styles.ContactStatus}>{statut}</Text>
+                        </View>
 
-                        {/** Statut du contact */}
-                        <Text style={styles.ContactStatus}>{statut}</Text>
+                        {/** Bouton de menu */}
+                        <TouchableOpacity style={styles.menuButton}>
+                            <Icon name="ellipsis-vertical" size={30} color={colors.pureWhite} />
+                        </TouchableOpacity>
                     </View>
+                </View>
 
-                    {/** Bouton de menu */}
-                    <TouchableOpacity style={styles.menuButton}>
-                        <Icon name="ellipsis-vertical" size={30} color={colors.pureWhite} />
+
+                {/** Liste des messages */}
+                <FlatList
+                    ref={flatListRef}
+                    data={messages}
+                    renderItem={renderMessage}
+                    keyExtractor={item => item.id}
+                    contentContainerStyle={[styles.messageList, { paddingBottom: keyboardHeight }]}
+                    showsVerticalScrollIndicator={false}
+                    onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
+
+                />
+
+                {/** Menu contextuel */}
+                <MenuActionBar
+                    isVisible={isMenuVisible}
+                    position={menuPosition}
+                    onClose={() => setIsMenuVisible(false)}
+                    options={menuOptions}
+                />
+
+
+                {/** Zone de texte de saisie de message */}
+                <View style={styles.inputContainer}>
+
+                    {/** Bouton d'envoi de fichier */}
+
+                    <TouchableOpacity style={styles.sendFilesButton}>
+                        <Text style={styles.sendFilesButtonText}>
+                            <Icon name='attach' size={35} color={colors.primary} />
+                        </Text>
+                    </TouchableOpacity>
+
+                    {/** Zone d'entrée de message */}
+                    <TextInput multiline={true}
+                        value={inputText}
+                        onChangeText={setInputText}
+                        style={styles.input} placeholder="Tapez un message..." />
+
+
+
+                    {/** Bouton d'envoi de message */}
+                    <TouchableOpacity style={styles.sendButton} onPress={() => { handleSendMessage(); }}>
+                        <Text style={styles.sendButtonText}>
+                            <Icon name="send" size={20} color={colors.pureWhite} />
+                        </Text>
                     </TouchableOpacity>
                 </View>
-            </View>
 
-
-            {/** Liste des messages */}
-            <FlatList
-                ref={flatListRef}
-                data={messages}
-                renderItem={renderMessage}
-                keyExtractor={item => item.id}
-                contentContainerStyle={[styles.messageList, { paddingBottom: keyboardHeight }]}
-                showsVerticalScrollIndicator={false}
-                onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
-
-            />
-
-            {/** Menu contextuel */}
-            <Modal visible={isMenuVisible} animationType="slide" onRequestClose={handleCloseMenu} presentationStyle='overFullScreen' statusBarTranslucent={false}
-                transparent={true}>
-                <TouchableOpacity style={styles.modalOverlay} onPress={handleCloseMenu}>
-                    <View style={[styles.menuContainer, { top: 0, left: 0 }]}>
-                        {/** Liste des options du menu */}
-                        {menuOptions.map((option, index) => (
-                            <TouchableOpacity key={index}
-                                style={styles.menuItemOption}
-                                onPress={() => { option.onPress; handleCloseMenu(); }}>
-                                <Text style={styles.menuOptionText}>{option.text}</Text>
-                                <Icon name={option.icon} size={20} color={colors.primary} />
-                            </TouchableOpacity>
-                        ))}
-                    </View>
-                </TouchableOpacity>
-            </Modal>
-
-
-            {/** Zone de texte de saisie de message */}
-            <View style={styles.inputContainer}>
-
-                {/** Bouton d'envoi de fichier */}
-
-                <TouchableOpacity style={styles.sendFilesButton}>
-                    <Text style={styles.sendFilesButtonText}>
-                        <Icon name='attach' size={35} color={colors.primary} />
-                    </Text>
-                </TouchableOpacity>
-
-                {/** Zone d'entrée de message */}
-                <TextInput multiline={true}
-                    value={inputText}
-                    onChangeText={setInputText}
-                    style={styles.input} placeholder="Tapez un message..." />
-
-
-
-                {/** Bouton d'envoi de message */}
-                <TouchableOpacity style={styles.sendButton} onPress={() => { handleSendMessage(); }}>
-                    <Text style={styles.sendButtonText}>
-                        <Icon name="send" size={20} color={colors.pureWhite} />
-                    </Text>
-                </TouchableOpacity>
             </View>
         </KeyboardAvoidingView>
     );
@@ -414,7 +409,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 15,
         paddingVertical: 10,
         marginHorizontal: 10,
-        maxHeight: 100,
+        maxHeight: 150,
         paddingLeft: 55,
         backgroundColor: colors.secondary_200,
         fontSize: 16,

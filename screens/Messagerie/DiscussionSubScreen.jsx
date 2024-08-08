@@ -1,4 +1,4 @@
-import { View, Text, Image, TextInput, TouchableOpacity, ScrollView, FlatList, Keyboard, Pressable, Dimensions, Platform } from 'react-native'
+import { View, Text, Image, TextInput, TouchableOpacity, StyleSheet, FlatList, Keyboard, Pressable, Dimensions, Platform } from 'react-native'
 import React, { useState, useRef, useCallback } from 'react';
 import Animated, {
   FadeIn,
@@ -25,6 +25,8 @@ import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import discussionsPlaceHolder from '../../assets/New-message-bro.png';
 
+import { Avatar, Badge } from 'react-native-paper';
+import HeaderComponent from '../../components/HeaderComponent';
 
 
 
@@ -44,7 +46,7 @@ export default function DiscussionSubScreen() {
     { id: '9', senderProfile: profil3, statut: "En ligne", senderName: 'Rose ', senderPhone: "+237 695 34 35 36", dernierMessage: 'Je t\'adore', time: '09 : 30', },
     { id: '10', senderProfile: profil2, statut: "En ligne", senderName: '', senderPhone: "+237 653 34 42 36", dernierMessage: 'Je veux continuer avec kivyMD ', time: '07 : 08', },
   ]
-
+  const DISCUSSION_LENGTH = discussionsData.length;
 
   const renderItem = ({ item }) =>
     // Composant d'une discussion
@@ -172,31 +174,24 @@ export default function DiscussionSubScreen() {
     <GestureHandlerRootView>
       <SafeAreaProvider>
         <Pressable onPress={closeSearchBar}>
-          <StatusBar style="light" />
+          <StatusBar style="light" backgroundColor={colors.primary} />
           <View className="flex-col items-center w-full h-full bg-primary">
 
 
-            {/** Header */}
-            <View className="flex-row items-center content-center justify-between w-full " style={
-              Platform.OS == "ios" ? { height: "10%", paddingHorizontal: 15, marginTop: "5%", marginBottom: -10 }
-                : { height: "10%", paddingHorizontal: 15, marginTop: "5%", marginBottom: -10 }}>
-              <Text className="font-bold text-white " style={{ fontSize: 28 }}>
-                Hallo Messenger
-              </Text>
 
-              <View style={{ flexDirection: "row", alignItems: "center", gap: 15 }} >
-                {/**Profil image */}
-                <TouchableOpacity>
-                  <Image source={myProfile} style={{ width: 30, height: 30, borderRadius: 50 }} />
-                </TouchableOpacity>
 
-                {/** Settings button */}
-                <TouchableOpacity>
-                  <Icon name="ellipsis-vertical" size={30} color="white" />
-                </TouchableOpacity>
-              </View>
+            {/** Header component */}
 
-            </View>
+            <HeaderComponent
+              myProfile={myProfile}
+              avatarSize={32}
+              headerTextStyle={styles.headerTextStyle}
+              headerText="Hallo Messenger"
+              headerStyle={[styles.headerStyle,
+              Platform.OS == "ios" ? { height: "10%", paddingHorizontal: 15, marginTop: "5%", marginBottom: 5 }
+                : { height: "9%", paddingHorizontal: 15, marginTop: "5%", marginBottom: 5 }]}
+              avatarContainerStyle={styles.avatarContainerStyle}
+            />
 
 
             {/** Discussions container */}
@@ -351,3 +346,19 @@ export default function DiscussionSubScreen() {
     </GestureHandlerRootView>
   )
 }
+
+const styles = StyleSheet.create({
+  headerStyle: {
+    backgroundColor: colors.primary,
+  },
+  headerTextStyle: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "white"
+  },
+  avatarContainerStyle: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 15
+  },
+})

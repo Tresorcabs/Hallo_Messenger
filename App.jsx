@@ -25,7 +25,7 @@ function App() {
 
 const RootNavigator = () => {
   return (
-    <Stack.Navigator initialRouteName="Messenger" screenOptions={{ headerShown: false }}>
+    <Stack.Navigator initialRouteName="Home" screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Home" component={HomeScreen} />
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="SignUp1" component={SignUpScreen1} />
