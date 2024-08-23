@@ -16,9 +16,12 @@ export default function HeaderComponent({ myProfile, avatarSize, avatarContainer
             {/** Avatar container */}
             <View style={avatarContainerStyle} >
                 {/** My Profil image */}
-                <TouchableOpacity>
-                    <Avatar.Image size={avatarSize} source={myProfile} />
-                </TouchableOpacity>
+                {myProfile ?
+                    <TouchableOpacity>
+                        <Avatar.Image size={avatarSize} source={myProfile} />
+                    </TouchableOpacity>
+                    : null}
+
 
                 {/** Settings button */}
                 <CustomSettingButton iconSize={25} iconColor="white" buttonStyle={styles.settingsButton} />

@@ -113,15 +113,15 @@ export default function ProfileScreen() {
                   className="p-3 m-5 rounded-full bg-secondary-btn-bg border-primary-200"
                   style={{ borderWidth: 1 }}
                 >
-                  {/*placeholder image */}
                   {image ? (
                     <Image
                       source={{ uri: image }}
                       className="w-40 h-40 rounded-full"
                     />
                   ) : (
+                    /*placeholder image */
                     <Image
-                      source={profil1}
+                      source={placeholderAvatar}
                       className="w-40 h-40 rounded-full"
                     />
                   )}

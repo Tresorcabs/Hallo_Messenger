@@ -12,20 +12,25 @@ import SignUpScreen5 from './screens/Inscription/SignUpScreen5';
 import SignUpEndScreen from './screens/Inscription/SignUpEndScreen';
 import ChatScreen from './screens/Messagerie/AdvancedScreens/ChatScreen';
 import UserProfileScreen from './screens/Messagerie/AdvancedScreens/UserProfileScreen';
+import SpotSelectorScreen from './screens/Messagerie/SpotScreens/SpotSelectorScreen';
+import SpotScreen from './screens/Messagerie/SpotScreens/SpotScreen';
+import { SpotProvider } from './Contexts/spotProvider';
 
 const Stack = createNativeStackNavigator();
 
 function App() {
   return (
-    <NavigationContainer>
-      <RootNavigator />
-    </NavigationContainer>
+    <SpotProvider >
+      <NavigationContainer>
+        <RootNavigator />
+      </NavigationContainer>
+    </SpotProvider>
   );
 }
 
 const RootNavigator = () => {
   return (
-    <Stack.Navigator initialRouteName="Home" screenOptions={{ headerShown: false }}>
+    <Stack.Navigator initialRouteName="Messenger" screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Home" component={HomeScreen} />
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="SignUp1" component={SignUpScreen1} />
@@ -38,6 +43,8 @@ const RootNavigator = () => {
       <Stack.Screen name='Messenger' component={MessengerScreen} />
       <Stack.Screen name='ChatScreen' component={ChatScreen} />
       <Stack.Screen name='userProfile' component={UserProfileScreen} />
+      <Stack.Screen name='SpotScreen' component={SpotScreen} />
+      <Stack.Screen name="SpotSelector" component={SpotSelectorScreen} />
     </Stack.Navigator>
   );
 }

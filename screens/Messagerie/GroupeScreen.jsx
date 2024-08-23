@@ -7,11 +7,12 @@ import HeaderComponent from '../../components/HeaderComponent'
 import CustomDivider from '../../components/CustomDivider';
 import myProfile from '../../assets/my.jpg';
 import colors from '../../components/colors';
+import DataContainer from '../../components/DataContainer'
 
 export default function GroupeScreen() {
   return (
 
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <GestureHandlerRootView style={{ flex: 1, backgroundColor: colors.primary }}>
       <SafeAreaProvider>
         <StatusBar style="light" backgroundColor={colors.primary} />
 
@@ -25,7 +26,10 @@ export default function GroupeScreen() {
             : { height: "9%", paddingHorizontal: 15, marginTop: "5%", marginBottom: 5 }]}
           avatarContainerStyle={styles.avatarContainerStyle} />
 
+        {/** Container des groupes de discussion */}
+        <DataContainer>
 
+        </DataContainer>
 
       </SafeAreaProvider>
     </GestureHandlerRootView>

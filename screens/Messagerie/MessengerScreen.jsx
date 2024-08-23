@@ -1,11 +1,13 @@
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import DiscussionSubScreen from './DiscussionSubScreen';
 import GroupeScreen from './GroupeScreen'
-import EnterpriseScreen from './EnterpriseScreen'
-import SpotScreen from './SpotScreen';
+import EnterpriseScreen from '../Entreprise/EnterpriseScreen';
+import SpotScreen from './SpotScreens/SpotScreen';
 import colors from '../../components/colors';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { Platform } from 'react-native';
+import 'react-native-gesture-handler';
+import { NavigationContainer } from '@react-navigation/native';
 
 const Tab = createMaterialBottomTabNavigator();
 
@@ -19,12 +21,12 @@ const TabArr = [
 
 function MessengerScreen() {
   return (
-
     <Tab.Navigator
 
       shifting={true}
       activeIndicatorStyle={{ backgroundColor: colors.secondary_btn_bg }}
       activeColor={colors.secondary_btn_bg}
+
       barStyle={Platform.OS === "android" ? { backgroundColor: colors.primary, bottom: 0, height: "9%", borderTopLeftRadius: 50, borderTopRightRadius: 50, elevation: 5 }
         : { backgroundColor: colors.primary, bottom: 0, height: "10%", borderTopLeftRadius: 50, borderTopRightRadius: 50 }}
     >

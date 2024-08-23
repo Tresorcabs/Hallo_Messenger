@@ -1,17 +1,5 @@
-import { View, Text, Image, TextInput, TouchableOpacity, StyleSheet, FlatList, Keyboard, Pressable, Dimensions, Platform } from 'react-native'
-import React, { useState, useRef, useCallback } from 'react';
-import Animated, {
-  FadeIn,
-  FadeInDown,
-  FadeInUp,
-  FadeOut,
-  SlideOutRight,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-  Easing,
-  runOnJS
-} from "react-native-reanimated";
+import { View, Text, Image, TouchableOpacity, StyleSheet, FlatList, Keyboard, Pressable, Dimensions, Platform } from 'react-native'
+import React, { useState } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
@@ -25,8 +13,10 @@ import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import discussionsPlaceHolder from '../../assets/New-message-bro.png';
 
-import { Avatar, Badge } from 'react-native-paper';
+import { AnimatedFAB } from 'react-native-paper';
 import HeaderComponent from '../../components/HeaderComponent';
+import CustomSearchBar from '../../components/CustomSearchBar';
+import DataContainer from '../../components/DataContainer';
 
 
 
@@ -91,77 +81,9 @@ export default function DiscussionSubScreen() {
 
     </View>
 
-  const [isSearchBarOpen, setIsSearchBarOpen] = useState(false);
-  const [searchText, setSearchText] = useState('');
-  const translateX = useSharedValue(0); // Commence hors écran à droite
-  const textInputRef = useRef(null);
-  const SEARCH_BUTTON_WIDTH = 2;
   const { width } = Dimensions.get('window');
-
-  const animatedStyles = useAnimatedStyle(() => {
-    return {
-      transform: [{ translateX: translateX.value }],
-    }
-  });
-  const toggleSearchBar = () => {
-
-    if (isSearchBarOpen && !searchText) {
-      // Fermer seulement si le TextInput est vide
-      closeSearchBar();
-    } else if (!isSearchBarOpen) {
-      // Ouvrir le TextInput
-      openSearchBar();
-    }
-
-  };
-
-  const openSearchBar = () => {
-
-    // Animation d'ouverture
-    translateX.value = withTiming(0 - SEARCH_BUTTON_WIDTH, {
-      duration: 300,
-      easing: Easing.bezier(0.25, 0.1, 0.25, 1),
-    }, () => {
-      // Lorsque le textInput est affiche, il est focus
-      runOnJS(focusSearchBarInput)();
-    });
-
-    setIsSearchBarOpen(true);
-  };
-
-  const closeSearchBar = () => {
-    Keyboard.dismiss();
-    // Animation de fermeture
-    translateX.value = withTiming(0, {
-      duration: 300,
-      easing: Easing.bezier(0.25, 0.1, 0.25, 1),
-    })
-    if (searchText === '') {
-      setIsSearchBarOpen(false);
-    }
-  };
-
-  const focusSearchBarInput = useCallback(() => {
-    if (textInputRef.current) {
-      textInputRef.current.focus();
-    }
-  }, []);
-  const handleTextChangeOnSearchBar = (text) => {
-    setSearchText(text);
-    // ferme si le contenu est vide 
-    if (text == '' && !isSearchBarOpen) {
-      closeSearchBar();
-    }
-  };
-
-  const handleBlurSearchBar = (text) => {
-    setSearchText(text);
-    if (text === '') {
-      closeSearchBar();
-    }
-  };
-
-
+  const flatListRef = React.useRef(null);
+  const { flatLisLength, setFlatListLength } = useState(discussionsData.length);
   const [filterBtnIsFocused, setFilterBtnIsFocused] = useState(true);
 
   const filterDiscussion = () => {
@@ -169,11 +91,24 @@ export default function DiscussionSubScreen() {
   }
 
 
+  // Bouton de création d'une nouvelle discussion
+
+  const [isExtended, setIsExtended] = React.useState(false);
+  const onScroll = (event) => {
+
+    const currentScrollPosition = event.nativeEvent?.contentOffset?.y; // On récupère la position du scroll actuelle
+    const isScrollingUp = currentScrollPosition < (onScroll.lastScrollPosition || 0) // On compare la position actuelle avec la position précédente
+    setIsExtended(!isScrollingUp); // on compare la position du scroll avec 0
+
+    onScroll.lastScrollPosition = currentScrollPosition; // On met a jour la position
+  }
+
+
   {/** ------------ Application Principale -------------  */ }
   return (
     <GestureHandlerRootView>
       <SafeAreaProvider>
-        <Pressable onPress={closeSearchBar}>
+        <Pressable>
           <StatusBar style="light" backgroundColor={colors.primary} />
           <View className="flex-col items-center w-full h-full bg-primary">
 
@@ -188,43 +123,16 @@ export default function DiscussionSubScreen() {
               headerTextStyle={styles.headerTextStyle}
               headerText="Hallo Messenger"
               headerStyle={[styles.headerStyle,
-              Platform.OS == "ios" ? { height: "10%", paddingHorizontal: 15, marginTop: "5%", marginBottom: 5 }
-                : { height: "9%", paddingHorizontal: 15, marginTop: "5%", marginBottom: 5 }]}
+              Platform.OS == "ios" ? { height: "10%", paddingHorizontal: 15, marginTop: "5%" }
+                : { height: "9%", paddingHorizontal: 15, marginTop: "5%" }]}
               avatarContainerStyle={styles.avatarContainerStyle}
             />
 
 
             {/** Discussions container */}
-            <Animated.View
-              entering={FadeInDown.delay(250).duration(5000).springify()}
-              className="flex-col items-center content-center justify-between w-full pt-6 pb-2 bg-white"
-              style={
-                Platform.OS == "android" ?
-                  {
-                    borderTopLeftRadius: 30,
-                    borderTopRightRadius: 30,
-                    width: "98%",
-                    height: "90%",
-                    shadowColor: "#000",
-                    zIndex: -100,
-                  }
-                  : {
-                    borderTopLeftRadius: 30,
-                    borderTopRightRadius: 30,
-                    width: "98%",
-                    height: "90%",
-                    shadowColor: "#000",
-                    zIndex: -100,
-                  }
-              }
-            >
-
+            <DataContainer>
 
               {/** search bar & Filter buttons */}
-
-
-
-
 
               <View style={{ height: 50, paddingHorizontal: 10 }} className="flex-row items-center content-center w-full">
 
@@ -243,30 +151,17 @@ export default function DiscussionSubScreen() {
 
                     <Icon name="mail-unread" size={20} style={{ color: !filterBtnIsFocused ? colors.secondary_btn_bg : colors.primary_200 }} />
                   </TouchableOpacity>
-
                 </View>
 
                 {/** ---------------------------------------------------------- */}
 
                 {/** search bar */}
-
-                <TouchableOpacity style={{ position: "absolute", right: 15, borderRadius: 50, width: 40, height: 40, alignItems: "center", justifyContent: "center", backgroundColor: colors.secondary_btn_bg, elevation: 3 }} onPress={toggleSearchBar}>
-                  {
-                    isSearchBarOpen
-                      ? //Close button
-                      <Icon name="close" size={25} color={colors.primary_200} />
-                      : //search button
-                      <Icon name="search" size={25} color={colors.primary_200} />
-
-                  }
-                </TouchableOpacity>
-
-                {isSearchBarOpen && <Animated.View style={[{ height: 45, width: "90%", position: "absolute", paddingLeft: 10, borderRadius: 50, }, animatedStyles]}><TextInput
-                  placeholder="Rechercher"
-                  ref={textInputRef}
-                  value={searchText}
-                  onChangeText={handleTextChangeOnSearchBar}
-                  style={{
+                <CustomSearchBar
+                  searchBarButtonStyle={{ position: "absolute", right: 15, borderRadius: 50, width: 40, height: 40, alignItems: "center", justifyContent: "center", backgroundColor: colors.secondary_btn_bg, elevation: 3 }}
+                  searchBarIconButtonStyle={colors.primary_200}
+                  searchBarStyle={{ height: 45, width: "90%", position: "absolute", paddingLeft: 10, borderRadius: 50, }}
+                  searchBarPlaceholder="Rechercher..."
+                  searchBarInputStyle={{
                     height: 45,
                     width: "100%",
                     backgroundColor: colors.secondary_btn_bg,
@@ -278,10 +173,8 @@ export default function DiscussionSubScreen() {
                     shadowOffset: { width: 0, height: 1 },
                     shadowOpacity: 0.8,
                     shadowRadius: 2,
-                  }} />
-                </Animated.View>
-                }
-
+                  }}
+                />
               </View>
 
               {/** ---------------------------------------------------------- */}
@@ -310,9 +203,13 @@ export default function DiscussionSubScreen() {
                   /** discussions list */
 
                   : <FlatList
+                    ref={flatListRef}
                     data={discussionsData}
                     renderItem={renderItem}
                     keyExtractor={item => item.id}
+                    onScroll={({ nativeEvent }) => onScroll(nativeEvent)}
+                    scrollEventThrottle={16}
+                    keyboardDismissMode='on-drag'
                     style={{
                       width: "100%",
                     }}
@@ -320,26 +217,23 @@ export default function DiscussionSubScreen() {
                 }
 
 
+
               </View>
 
               {/** New discussion Button */}
 
-              <TouchableOpacity
-                style={{
-                  position: "absolute",
-                  bottom: 50,
-                  right: 20,
-                  width: 60,
-                  height: 60,
-                  borderRadius: 50,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  backgroundColor: colors.primary_200,
-                  elevation: 3
-                }}>
-                <Icon name="add" size={35} color={colors.secondary_btn_bg} />
-              </TouchableOpacity>
-            </Animated.View>
+              <AnimatedFAB
+                icon="plus"
+                label='Nouvelle'
+                animateFrom='right'
+                extended={isExtended}
+                visible={true}
+                iconMode='dynamic'
+                color={colors.secondary_btn_bg}
+                style={styles.fabStyle}
+                customStyle={styles.customStyle} />
+
+            </DataContainer>
           </View>
         </Pressable>
       </SafeAreaProvider>
@@ -360,5 +254,17 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 15
+  },
+  fabStyle: {
+    bottom: 40,
+    right: 20,
+    position: 'absolute',
+    backgroundColor: colors.primary,
+  },
+  customStyle: {
+    paddingHorizontal: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 })

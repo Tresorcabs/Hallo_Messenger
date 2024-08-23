@@ -1,6 +1,24 @@
 {
   "expo": {
     "name": "HalloMessenger",
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
+          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
+          "recordAudioAndroid": true
+        }
+      ],
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "Autoriser $(PRODUCT_NAME) à accéder à vos photos.",
+          "savePhotosPermission": "Autoriser $(PRODUCT_NAME) à sauvegarder des photos.",
+          "isAccessMediaLocationEnabled": true
+        }
+      ]
+    ],
     "slug": "hallo-messenger",
     "version": "1.0.0",
     "orientation": "portrait",

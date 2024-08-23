@@ -17,7 +17,20 @@ const colors = {
     statutIndicatorBorder: '#556581',
 
     redAlert: '#E72929',
-    alertButtonBg: '#FFE4CF'
+    alertButtonBg: '#FFC3C3',
+    glassBlackBtn: "rgba(0, 0, 0, 0.2)",
+
+    PersonnelButtonBg: '#BAC7CE',
+    PersonnelTextColor: '#6694B6',
+
+    CommunicationButtonBg: '#E9CDCD',
+    CommunicationTextColor: '#C55E5E',
+
+    MarketingButtonBg: '#EEFBF5',
+    MarketingTextColor: '#9D9D9D',
+    
+    StatisticsButtonBg: '#DFE3C2',
+    StatisticsTextColor: '#9D9D9D',
 };
 
 export default colors;
