@@ -18,7 +18,7 @@ const colors = {
 
     redAlert: '#E72929',
     alertButtonBg: '#FFC3C3',
-    glassBlackBtn: "rgba(0, 0, 0, 0.2)",
+    glassBlackBtn: "rgba(0, 0, 0, 0.05)",
 
     PersonnelButtonBg: '#BAC7CE',
     PersonnelTextColor: '#6694B6',
@@ -27,10 +27,10 @@ const colors = {
     CommunicationTextColor: '#C55E5E',
 
     MarketingButtonBg: '#EEFBF5',
-    MarketingTextColor: '#9D9D9D',
+    MarketingTextColor: '#27A584',
     
     StatisticsButtonBg: '#DFE3C2',
-    StatisticsTextColor: '#9D9D9D',
+    StatisticsTextColor: '#909000',
 };
 
 export default colors;

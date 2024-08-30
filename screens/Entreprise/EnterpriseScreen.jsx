@@ -1,159 +1,80 @@
-import { View, Text, StyleSheet, Platform, TouchableOpacity, ScrollView } from 'react-native'
-import React from 'react'
-import HeaderComponent from '../../components/HeaderComponent';
+import * as React from 'react'
+import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer';
+import EnterpriseDashboard from './EnterpriseDashboard';
+import EnterpriseProjects from './EnterpriseProjects';
+import EnterpriseMembers from './EnterpriseMembers';
 import colors from '../../components/colors';
-import { StatusBar } from 'expo-status-bar';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import CustomSearchBar from '../../components/CustomSearchBar';
+import { StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { View, Text, TouchableOpacity } from 'react-native';
+import { Badge } from 'react-native-paper';
 
-export default function EnterpriseScreen() {
-  return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+const Drawer = createDrawerNavigator();
 
-      <View style={styles.container}>
+const EnterpriseScreen = () => {
 
-        <StatusBar style="light" backgroundColor={colors.primary} />
+  function CustomDrawerContent(props) { // il s'agit d'un composant de drawer
+    return (
+      <DrawerContentScrollView {...props}>
+        {/** Ajout du nom de l'entreprise , du logo et d'une icône notification en haut des labels de screen */}
 
-        {/** Header Component */}
-        <HeaderComponent
-          avatarSize={32}
-          headerTextStyle={styles.headerTextStyle}
-          headerText="Entreprise"
-          headerStyle={[styles.headerStyle,
-          Platform.OS == "ios" ? { height: "10%", paddingHorizontal: 15, marginTop: "5%" }
-            : { height: "9%", paddingHorizontal: 15, marginTop: "5%" }]}
-          avatarContainerStyle={styles.avatarContainerStyle} />
+        {/* Ajouter des éléments personnalisés directement dans le Drawer */}
+        <View style={{ padding: 10, paddingLeft: 15, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderBottomColor: colors.primary, borderBottomWidth: 0.3, marginBottom: 10 }}>
 
-        {/** ---------------------------------------------------------- */}
-
-        {/** Menu Principal */}
-        <View style={styles.MenuPrincipal}>
-          <View style={styles.headerDuMenu}>
-            {/** Texte Menu */}
-            <Text style={styles.NomMenu}>Menu Principal </Text>
-
-            {/** Barre de recherche */}
-
-            <CustomSearchBar
-              searchBarButtonStyle={{ position: "absolute", right: 15, borderRadius: 50, width: 40, height: 40, alignItems: "center", justifyContent: "center", backgroundColor: colors.secondary_btn_bg, elevation: 3 }}
-              searchBarIconButtonStyle={colors.primary_200}
-              searchBarStyle={{ height: 45, width: "85%", position: "absolute", borderRadius: 50, }}
-              searchBarPlaceholder="Rechercher..."
-              searchBarInputStyle={{
-                height: 45,
-                width: "100%",
-                backgroundColor: colors.secondary_btn_bg,
-                borderRadius: 50,
-                paddingHorizontal: 20,
-                elevation: 3,
-
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: 1 },
-                shadowOpacity: 0.8,
-                shadowRadius: 2,
-              }}
-            />
-
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 25 }}>
+            <Icon name="person-circle-outline" size={30} color={colors.primary} />
+            <Text style={{ fontSize: 18, marginVertical: 10, fontWeight: '700', color: colors.primary }}>E-Startup</Text>
           </View>
 
-          {/** Les options de menu */}
-          <View style={{ flexDirection: "column", alignItems: "center", justifyContent: "center", marginTop: 10, height: "85%" }}>
-            <View style={styles.menuOptionView}>
-
-              <TouchableOpacity style={[styles.menuOption, { backgroundColor: colors.PersonnelButtonBg, }]}>
-                <Icon name="body" size={30} color={colors.PersonnelTextColor} />
-                <Text style={{ fontWeight: "bold", color: colors.PersonnelTextColor }}>Personnel</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity style={[styles.menuOption, { backgroundColor: colors.CommunicationButtonBg, }]}>
-                <Icon name="chatbox-ellipses" size={30} color={colors.CommunicationTextColor} />
-                <Text style={{ fontWeight: "bold", color: colors.CommunicationTextColor }}>Communication</Text>
-              </TouchableOpacity>
-            </View>
-
-            <View style={styles.menuOptionView}>
-              <TouchableOpacity style={[styles.menuOption, { backgroundColor: colors.MarketingButtonBg, }]}>
-                <Icon name="chatbox-ellipses" size={30} color={colors.CommunicationTextColor} />
-                <Text style={{ fontWeight: "bold", color: colors.CommunicationTextColor }}>Marketing</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity style={[styles.menuOption, { backgroundColor: colors.StatisticsButtonBg, }]}>
-                <Icon name="chatbox-ellipses" size={30} color={colors.CommunicationTextColor} />
-                <Text style={{ fontWeight: "bold", color: colors.CommunicationTextColor }}>Statistiques</Text>
-              </TouchableOpacity>
-            </View>
-
-
-          </View>
+          {/* Ajouter des boutons ou autres éléments */}
+          <TouchableOpacity style={{ padding: 10, }}>
+            <Icon name="notifications-outline" size={24} color={colors.primary_bold} />
+          </TouchableOpacity>
         </View>
 
-        {/** ---------------------------------------------------------- */}
+        {/* Inclure les items de navigation */}
+        <DrawerItemList {...props} />
 
-        {/** Menu Principal */}
-        <View style={styles.MenuPrincipal}>
-          <View style={styles.headerDuMenu}>
-            {/** Texte Menu */}
-            <Text>Activités / Tâches </Text>
+      </DrawerContentScrollView>
+    );
+  }
 
-            {/** Liste des Tâches */}
-
-          </View>
-        </View>
+  function customDrawerLabel({ label, badgeCount }) {
+    return (
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, justifyContent: 'space-between' }}>
+        <Text style={{ color: colors.primary, fontWeight: '700' }}>{label}</Text>
+        {badgeCount > 0 && <Badge style={{ backgroundColor: colors.secondary_btn_bg, color: colors.primary, fontSize: 14 }}>{badgeCount}</Badge>}
       </View>
-    </GestureHandlerRootView>
+    );
+  }
+  return (
+    <Drawer.Navigator initialRouteName='Dashboard' screenOptions={{
+      headerStyle: styles.drawerHeader,
+      headerTintColor: colors.pureWhite,
+      headerPressColor: colors.secondary_btn_bg,
+      drawerActiveBackgroundColor: colors.secondary_btn_bg,
+      drawerActiveTintColor: colors.primary,
+      drawerInactiveTintColor: colors.primary_bold,
+
+    }}
+      drawerContent={(props) => <CustomDrawerContent {...props} />}
+    >
+      <Drawer.Screen name='Tableau de bord' component={EnterpriseDashboard} options={{
+        drawerIcon: ({ focused, color, size }) => <Icon name={focused ? "podium" : "podium-outline"} size={size} color={color} />,
+
+      }} />
+      <Drawer.Screen name='Membres' component={EnterpriseMembers} options={{
+        drawerIcon: ({ focused, color, size }) => <Icon name={focused ? "people" : "people-outline"} size={size} color={color} />,
+        drawerLabel: () => customDrawerLabel({ label: 'Membres', badgeCount: 3 }),
+      }} />
+      <Drawer.Screen name='Projets' component={EnterpriseProjects} options={{ drawerIcon: ({ focused, color, size }) => <Icon name={focused ? "folder-open" : "folder-outline"} size={size} color={color} /> }} />
+    </Drawer.Navigator>
   )
 }
 
 const styles = StyleSheet.create({
-  container: {
-    height: "100%",
-  },
-  headerStyle: {
+  drawerHeader: {
     backgroundColor: colors.primary,
   },
-  headerTextStyle: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: "white"
-  },
-  avatarContainerStyle: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 15
-  },
-  headerDuMenu: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 10,
-  },
-  MenuPrincipal: {
-    height: 350,
-    backgroundColor: colors.pureWhite,
-    marginBottom: 10,
-    paddingVertical: 15,
-    paddingHorizontal: 10,
-  },
-  NomMenu: {
-    fontSize: 20,
-    fontWeight: "500",
-  },
-  menuOptionView: {
-    flexDirection: "row",
-    gap: 10,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  menuOption: {
-    height: "85%",
-    width: "45%",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 10,
-    borderRadius: 20,
-    elevation: 3,
-
-
-  }
-});
+})
+export default EnterpriseScreen

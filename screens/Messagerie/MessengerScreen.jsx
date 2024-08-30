@@ -1,20 +1,17 @@
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import DiscussionSubScreen from './DiscussionSubScreen';
-import GroupeScreen from './GroupeScreen'
+import CommunityScreen from './CommunityScreen'
 import EnterpriseScreen from '../Entreprise/EnterpriseScreen';
-import SpotScreen from './SpotScreens/SpotScreen';
 import colors from '../../components/colors';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { Platform } from 'react-native';
 import 'react-native-gesture-handler';
-import { NavigationContainer } from '@react-navigation/native';
 
 const Tab = createMaterialBottomTabNavigator();
 
 const TabArr = [
   { id: 1, route: 'Discussions', label: 'Discussions', activeIcon: 'chatbox-ellipses', inactiveIcon: 'chatbox-ellipses-outline', component: DiscussionSubScreen },
-  { id: 2, route: 'Spots', label: 'Spots', activeIcon: 'flame', inactiveIcon: 'flame-outline', component: SpotScreen },
-  { id: 3, route: 'Groupes', label: 'Groupes', activeIcon: 'people', inactiveIcon: 'people-outline', component: GroupeScreen },
+  { id: 3, route: 'Communautés', label: 'Communautés', activeIcon: 'people', inactiveIcon: 'people-outline', component: CommunityScreen },
   { id: 4, route: 'Entreprise', label: 'Entreprise', activeIcon: 'business', inactiveIcon: 'business-outline', component: EnterpriseScreen },
 
 ];

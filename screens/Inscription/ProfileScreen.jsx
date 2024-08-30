@@ -59,15 +59,8 @@ export default function ProfileScreen() {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View className="flex-col items-center w-full h-full bg-primary">
-        <Animated.View
-          entering={FadeInUp.delay(150).duration(1000).springify()}
-          className="flex-row items-center content-center w-full gap-10 h-1/6"
-          style={{ marginVertical: 20, marginTop: 10 }}
-        >
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={{ paddingHorizontal: 25, paddingVertical: 5 }}
-          >
+        <Animated.View entering={FadeInUp.delay(150).duration(1000).springify()} className="flex-row items-center content-center w-full h-1/6" style={{ gap: 10, marginBottom: 5, marginTop: 5, paddingHorizontal: 10, }}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={{ paddingLeft: 10, }}>
             <Icon
               name="arrow-left"
               size={20}

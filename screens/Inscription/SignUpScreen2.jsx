@@ -44,15 +44,8 @@ export default function SignUpScreen2() {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View className="flex-col items-center w-full h-full bg-primary">
-        <Animated.View
-          entering={FadeInUp.delay(150).duration(1000).springify()}
-          className="flex-row items-center content-center w-full gap-10 h-1/6"
-          style={{ marginVertical: 20, marginTop: 10 }}
-        >
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={{ paddingHorizontal: 25, paddingVertical: 5 }}
-          >
+        <Animated.View entering={FadeInUp.delay(150).duration(1000).springify()} className="flex-row items-center content-center w-full h-1/6" style={{ gap: 10, marginBottom: 5, marginTop: 5, paddingHorizontal: 10, }}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={{ paddingLeft: 10, }}>
             <Icon
               name="arrow-left"
               size={20}
@@ -75,43 +68,43 @@ export default function SignUpScreen2() {
             shadowColor: "#000",
           }}
         >
-          
-          <ScrollView showsVerticalScrollIndicator={false} style={{width: "95%"}}>
-          {/** Inputs view */}
-          <View className="flex-col items-center content-center w-full">
-            {/** country selector */}
-            <View
-              className="w-4/5 m-5 border-primary-200 rounded-xl placeholder:text-behind-input"
-              style={{ borderWidth: 1 }}
-            >
-              <RNPickerSelect
-                placeholder={{ label: "Pays", value: null, color: colors.behind_input }}
-                style={{
-                  inputAndroid: { color: "#0C7E47", height: 50 },
-                  inputIOS: { color: "#0C7E47", height: 50, paddingLeft:10 },
-                }}
-                onValueChange={handleCountryChange}
-                items={countryData.map((country) => ({
-                  label: country.flag + "    |   " + country.name,
-                  key: country.code,
-                  value: country.name,
-                }))}
-              />
-            </View>
 
-            {/** Phone Input */}
-            <Animated.View
-              entering={FadeInUp.delay(400).duration(1000).springify()}
-              className="items-center content-center w-full "
-            >
-              <TextInput
-                className="w-4/5 p-3 m-5 border-primary-200 rounded-xl placeholder:text-behind-input"
+          <ScrollView showsVerticalScrollIndicator={false} style={{ width: "95%" }}>
+            {/** Inputs view */}
+            <View className="flex-col items-center content-center w-full">
+              {/** country selector */}
+              <View
+                className="w-4/5 m-5 border-primary-200 rounded-xl placeholder:text-behind-input"
                 style={{ borderWidth: 1 }}
-                placeholder={`${countryDialCode}`}
-                keyboardType="numeric"
-              ></TextInput>
-            </Animated.View>
-          </View>
+              >
+                <RNPickerSelect
+                  placeholder={{ label: "Pays", value: null, color: colors.behind_input }}
+                  style={{
+                    inputAndroid: { color: "#0C7E47", height: 50 },
+                    inputIOS: { color: "#0C7E47", height: 50, paddingLeft: 10 },
+                  }}
+                  onValueChange={handleCountryChange}
+                  items={countryData.map((country) => ({
+                    label: country.flag + "    |   " + country.name,
+                    key: country.code,
+                    value: country.name,
+                  }))}
+                />
+              </View>
+
+              {/** Phone Input */}
+              <Animated.View
+                entering={FadeInUp.delay(400).duration(1000).springify()}
+                className="items-center content-center w-full "
+              >
+                <TextInput
+                  className="w-4/5 p-3 m-5 border-primary-200 rounded-xl placeholder:text-behind-input"
+                  style={{ borderWidth: 1 }}
+                  placeholder={`${countryDialCode}`}
+                  keyboardType="numeric"
+                ></TextInput>
+              </Animated.View>
+            </View>
 
           </ScrollView>
           {/** Action Buttons */}
