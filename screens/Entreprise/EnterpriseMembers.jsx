@@ -8,34 +8,48 @@ import profil3 from "../../assets/profil3.jpg";
 import CustomSettingButton from '../../components/CustomSettingButton';
 import colors from '../../components/colors';
 import CustomSearchBarTwo from '../../components/CustomSearchBarTwo';
-import { EntrepriseDataProvider } from '../../Contexts/EntrepriseDataContext';
+import { EnterpriseDataContext } from '../../Contexts/EntrepriseDataContext';
+import { getEnterpriseMembers } from '../../EntrepriseApi/EntrepriseDataService';
+import { useState } from 'react';
+import { UserProfileContext } from '../../Contexts/UserProfileContext';
 
 const EnterpriseMembers = () => {
 
     // Données des membres de l'Entreprise
 
-    const MembersData = [
-        { memberId: 1, name: "Kalidou Koulibaly", profile: profil1, Bio: "Je suis Manager ", memberSince: "10/10/2023", userRole: "Admin" },
-        { memberId: 2, name: "Rasmus Leerdof ", profile: profil3, Bio: "Je suis Programmeur", memberSince: "10/10/2023", userRole: "Member" },
-        { memberId: 3, name: "Linus Torvalds", profile: profil2, Bio: "Je suis Programmeur", memberSince: "10/10/2023", userRole: "Member" },
-        { memberId: 4, name: "Patrick Jane", profile: profil1, Bio: "Je suis marketeur", memberSince: "10/10/2023", userRole: "Member" },
-        { memberId: 5, name: "Ryan Reenolds", profile: profil3, Bio: "Hello World", memberSince: "10/10/2023", userRole: "Member" },
-        { memberId: 6, name: "Stanley Omah", profile: profil2, Bio: "Hello World", memberSince: "10/10/2023", userRole: "Member" },
-    ];
+    //const MembersData = [
+    //{ memberId: 1, name: "Kalidou Koulibaly", profile: profil1, Bio: "Je suis Manager ", memberSince: "10/10/2023", userRole: "Admin" },
+    // { memberId: 2, name: "Rasmus Leerdof ", profile: profil3, Bio: "Je suis Programmeur", memberSince: "10/10/2023", userRole: "Member" },
+    // { memberId: 3, name: "Linus Torvalds", profile: profil2, Bio: "Je suis Programmeur", memberSince: "10/10/2023", userRole: "Member" },
+    // { memberId: 4, name: "Patrick Jane", profile: profil1, Bio: "Je suis marketeur", memberSince: "10/10/2023", userRole: "Member" },
+    // { memberId: 5, name: "Ryan Reenolds", profile: profil3, Bio: "Hello World", memberSince: "10/10/2023", userRole: "Member" },
+    // { memberId: 6, name: "Stanley Omah", profile: profil2, Bio: "Hello World", memberSince: "10/10/2023", userRole: "Member" },
 
-    const countMembers = MembersData.length;
-    const { updateGeneralData } = useContext(EntrepriseDataProvider);
+    //];
+
+    const [MembersData, setMembersData] = useState(null);
+    //const countMembers = MembersData.length;
+    const { userProfileData, updateUserProfileData } = useContext(UserProfileContext);
 
     useEffect(() => {
-        updateGeneralData({ countMembers: countMembers })
+        getEntrepriseData();
     }, []);
+
+    const getEntrepriseData = async () => {
+        const response = await getEnterpriseMembers();
+        if (response) {
+            //console.log(" Réponse de la requête pour les membres:", response);
+            setMembersData(response);
+
+        }
+    }
 
     const renderMember = ({ item }) => {
         return (
             <TouchableOpacity style={styles.memberContainer}>
                 {/** MemberProfile */}
                 <View style={styles.memberProfileContainer}>
-                    <Image source={item.profile} style={styles.memberProfile} />
+                    <Image source={{ uri: item.profile }} style={styles.memberProfile} />
                 </View>
 
                 {/** Infos du membre  */}
@@ -45,8 +59,16 @@ const EnterpriseMembers = () => {
                         <Text style={styles.memberName}>{item.name}</Text>
                         {/** Indicateur du rôle du membre */}
                         {
-                            item.userRole === "Admin" ?
+                            item.userRole === "admin" ?
                                 <Text style={styles.userRoleIndicator}>[ {item.userRole} ]</Text>
+                                :
+                                null
+                        }
+
+                        {/** On vérifie si c'est l'utilisateur courant */}
+                        {
+                            userProfileData.id === item.memberId ?
+                                <Text style={styles.userRoleIndicator}>[ Vous ]</Text>
                                 :
                                 null
                         }

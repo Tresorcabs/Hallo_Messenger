@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, Platform, TouchableOpacity, Image, FlatList } from 'react-native'
-import React from 'react'
+import React, { useContext } from 'react'
 import HeaderComponent from '../../components/HeaderComponent';
 import colors from '../../components/colors';
 import { StatusBar } from 'expo-status-bar';
@@ -10,6 +10,9 @@ import profil2 from "../../assets/profil2.jpg";
 import profil3 from "../../assets/profil3.jpg";
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
+import { EnterpriseDataContext } from '../../Contexts/EntrepriseDataContext';
+import { useEffect } from 'react';
+import { getEnterpriseMembers, getProjectData } from '../../EntrepriseApi/EntrepriseDataService';
 
 export default function EnterpriseDashboard({ navigation }) {
 
@@ -52,6 +55,34 @@ export default function EnterpriseDashboard({ navigation }) {
     //    récupération des données générales de l'entreprise à travers le contexte
 
 
+    const { updateGeneralData, generalData } = useContext(EnterpriseDataContext);
+
+    useEffect(() => {
+        getEntrepriseData();
+    }, []);
+
+    const getEntrepriseData = async () => {
+        const response = await getEnterpriseMembers();
+        if (response) {
+            //console.log(" Réponse de la requête pour les membres:", response);
+            updateGeneralData({ countMembers: response.length, membersData: response })
+            //console.log(generalData)
+        }
+        getEnterpriseProjects();
+    }
+
+    const getEnterpriseProjects = async () => {
+        try {
+            const response = await getProjectData();
+            if (response) {
+                updateGeneralData({ countProjects: response.length });
+                console.log(generalData)
+                //console.log("Liste des projets ---> ", response);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
 
     const renderTask = ({ item }) => {
         return (
@@ -176,14 +207,14 @@ export default function EnterpriseDashboard({ navigation }) {
                                 ]}
                                 onPress={() => navigation.navigate("Membres")}
                             >
-                                <Text style={styles.numbMembres}>20</Text>
+                                <Text style={styles.numbMembres}>{generalData.countMembers}</Text>
                                 <Text
                                     style={{
                                         fontWeight: "bold",
                                         color: colors.PersonnelTextColor,
                                     }}
                                 >
-                                    Membres (actifs)
+                                    Membre (s) (actif (s))
                                 </Text>
                             </TouchableOpacity>
 
@@ -195,7 +226,7 @@ export default function EnterpriseDashboard({ navigation }) {
                                 onPress={() => navigation.navigate("Projets")}
                             >
                                 <Text style={styles.numbProjets}>
-                                    50 <Text style={{ fontSize: 20 }}>/ 100</Text>
+                                    0 <Text style={{ fontSize: 20 }}>/ {generalData.countProjects}</Text>
                                 </Text>
                                 <Text
                                     style={{
@@ -216,7 +247,7 @@ export default function EnterpriseDashboard({ navigation }) {
                                 ]}
                                 onPress={() => navigation.navigate("Abonnés")}
                             >
-                                <Text style={styles.numbAbonnés}>1340</Text>
+                                <Text style={styles.numbAbonnés}>{generalData.countEnterpriseSubscribers}</Text>
                                 <Text
                                     style={{
                                         fontWeight: "bold",
@@ -233,14 +264,14 @@ export default function EnterpriseDashboard({ navigation }) {
                                     { backgroundColor: colors.StatisticsButtonBg },
                                 ]}
                             >
-                                <Text style={styles.numTest}>140</Text>
+                                <Text style={styles.numTest}>0%</Text>
                                 <Text
                                     style={{
                                         fontWeight: "bold",
                                         color: colors.StatisticsTextColor,
                                     }}
                                 >
-                                    texte facultatif
+                                    Performances
                                 </Text>
                             </TouchableOpacity>
                         </View>
@@ -259,11 +290,12 @@ export default function EnterpriseDashboard({ navigation }) {
 
 
                     {/** Liste des Tâches */}
-                    <FlatList
+                    {/* <FlatList
                         data={taskData}
                         renderItem={renderTask}
                         keyExtractor={item => item.id}
-                    />
+                    /> */}
+                    <Text> Aucune activité récente pour le moment</Text>
                 </View>
             </View>
         </GestureHandlerRootView>
@@ -354,11 +386,6 @@ const styles = StyleSheet.create({
         marginHorizontal: 8,
         borderRadius: 5,
         backgroundColor: colors.glassBlackBtn,
-
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.8,
-        shadowRadius: 2,
     },
     taskInfos: {
         flex: 1,

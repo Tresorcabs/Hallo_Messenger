@@ -1,0 +1,62 @@
+
+##### Envoyer la requête de connexion au backend :
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const handleLogin = async (username, password) => {
+  try {
+    const response = await fetch('http://your-backend-url/connexion', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        nom_utilisateur: username,
+        mot_de_passe: password,
+      }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      const token = data.access_token;
+
+      // Stockage du token dans AsyncStorage
+      await AsyncStorage.setItem('authToken', token);
+
+      console.log('Connexion réussie, token stocké:', token);
+    } else {
+      console.log('Échec de la connexion');
+    }
+  } catch (error) {
+    console.error('Erreur lors de la connexion:', error);
+  }
+};
+
+
+
+######## Utiliser le token pour les futures requêtes authentifiées :
+
+Lors des requêtes suivantes qui nécessitent une authentification
+
+
+const fetchProtectedData = async () => {
+  try {
+    const token = await AsyncStorage.getItem('authToken');
+
+    const response = await fetch('http://your-backend-url/protected-endpoint', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log('Données protégées:', data);
+    } else {
+      console.log('Accès refusé');
+    }
+  } catch (error) {
+    console.error('Erreur lors de la récupération des données protégées:', error);
+  }
+};

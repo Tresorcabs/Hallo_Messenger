@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, Image, Platform } from 'react-native'
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { StatusBar } from 'expo-status-bar'
@@ -13,6 +13,7 @@ import { useNavigation } from '@react-navigation/native'
 import placeholderGroup from '../../assets/placeholder_group.jpg';
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import CustomSearchBarTwo from '../../components/CustomSearchBarTwo'
+import { UserProfileContext } from '../../Contexts/UserProfileContext'
 
 export default function CommunityScreen() {
 
@@ -29,11 +30,11 @@ export default function CommunityScreen() {
     { id: 6, name: "Egypt", logo: placeholderGroup, lastPost: "Hello World", members: 5, posts: 10, lastPostDate: "10:00", lastPostUser: "John Doe", lastPostUserAvatar: myProfile, isCommunity: true },
   ];
 
-
+  const { userProfileData, updateUserProfileData } = useContext(UserProfileContext);
 
   const renderCommunity = ({ item }) => {
     return (
-      <TouchableOpacity style={{ width: "88%", }} onPress={() => navigation.navigate("ChatScreen", { communityId: item.id, nom: item.name, profile: item.logo, members: item.members, isCommunity: item.isCommunity })}>
+      <TouchableOpacity style={{ width: "88%", }} onPress={() => navigation.navigate("ChatScreen", { communityId: item.id, nom: item.name, logo: item.logo, members: item.members, isCommunity: item.isCommunity })}>
         <View style={{ flexDirection: "row", alignItems: "center", padding: 10, gap: 10, }}>
           <View style={{ width: 50, height: 50, borderRadius: 50, backgroundColor: colors.primary, justifyContent: "center", alignItems: "center" }}>
             <Image source={item.logo} style={{ width: 50, height: 50, borderRadius: 50 }} />
@@ -66,14 +67,16 @@ export default function CommunityScreen() {
         <StatusBar style="light" backgroundColor={colors.primary} />
 
         {/** Header Component */}
-        <HeaderComponent myProfile={myProfile}
+        <HeaderComponent
           avatarSize={32}
+          myProfile={userProfileData ? userProfileData.photo_de_profil : null}
           headerTextStyle={styles.headerTextStyle}
           headerText="Communautés"
           headerStyle={[styles.headerStyle,
-          Platform.OS == "ios" ? { height: "10%", paddingHorizontal: 15, marginTop: "5%", marginBottom: 5 }
-            : { height: "9%", paddingHorizontal: 15, marginTop: "5%", marginBottom: 5 }]}
-          avatarContainerStyle={styles.avatarContainerStyle} />
+          Platform.OS == "ios" ? { height: "12%", paddingHorizontal: 15, marginTop: "5%", marginBottom: 5 }
+            : { height: "10%", paddingHorizontal: 15, marginTop: "5%", marginBottom: 5 }]}
+          avatarContainerStyle={styles.avatarContainerStyle}
+          avatarStyle={{ width: 30, height: 30, borderRadius: 50 }} />
 
         {/** Container des groupes de discussion */}
         <DataContainer>
@@ -92,11 +95,6 @@ export default function CommunityScreen() {
                 borderRadius: 50,
                 paddingHorizontal: 20,
                 elevation: 3,
-
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: 1 },
-                shadowOpacity: 0.8,
-                shadowRadius: 2,
               }}
             />
           </View>

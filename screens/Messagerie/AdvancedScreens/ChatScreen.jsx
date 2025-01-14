@@ -12,6 +12,7 @@ import {
     Platform,
     Keyboard,
     Modal,
+    AppState,
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import colors from "../../../components/colors";
@@ -23,59 +24,63 @@ import { GestureHandlerRootView, TouchableWithoutFeedback } from "react-native-g
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import * as ImagePicker from "expo-image-picker";
 import * as DocumentPicker from "expo-document-picker";
-
+import { io } from "socket.io-client";
 import postedImage from "../../../assets/post.png";
+import { getMessages, sendMessage } from "../../../api/dataServices";
+import moment from "moment";
+import NetInfo from "@react-native-community/netinfo";
+import placeholderGroup from '../../../assets/placeholder_group.jpg';
 
 // Données factices pour les messages
 const messagesData = {
-    1: [
-        { id: "m1", text: "hi !", isSent: false, timestamp: "10:30" },
-        { id: "m2", text: "yeah ! massa", isSent: true, timestamp: "10:31" },
-        {
-            id: "m3",
-            text: "Lorem ipsum, dolour sit amet consectetur adipisicing elit. Nulla corporis nemo in sint excepturi aut  !",
-            isSent: false,
-            timestamp: "10:30",
-        },
-        {
-            id: "m4",
-            text: "fugs quia et volupté total, a, commodi quo quae tenetur mollitia sunt suscipit quidem nostrum! ?",
-            isSent: true,
-            timestamp: "10:31",
-        },
-        { id: "m5", text: "je m'amuse bien  !", isSent: false, timestamp: "10:30" },
-        { id: "m6", text: "moi aussi", isSent: true, timestamp: "10:31" },
-        { id: "m7", text: "Salut !", isSent: false, timestamp: "10:30" },
-        { id: "m8", text: "Comment ça va ?", isSent: true, timestamp: "10:31" },
-        {
-            id: "m9",
-            text: "Le programme avance bien !",
-            image: postedImage,
-            isSent: true,
-            timestamp: "10:31",
-        },
-        { id: "m10", text: "Salut !", isSent: false, timestamp: "10:30" },
-        { id: "m11", text: "Salut !", isSent: false, timestamp: "10:30" },
-        { id: "m12", text: "Comment ça va ?", isSent: true, timestamp: "10:31" },
-        {
-            id: "m13",
-            text: "Le programme avance bien !",
-            isSent: true,
-            timestamp: "10:31",
-        },
-    ],
-    2: [
-        { id: "m1", text: "hi !", isSent: false, timestamp: "10:30" },
-        { id: "m2", text: "yeah ! massa", isSent: true, timestamp: "10:31" },
-    ],
-    3: [
-        { id: "m1", text: "hi !", isSent: false, timestamp: "10:30" },
-        { id: "m2", text: "yeah ! massa", isSent: true, timestamp: "10:31" },
-    ],
-    4: [
-        { id: "m1", text: "hi !", isSent: false, timestamp: "10:30" },
-        { id: "m2", text: "yeah ! massa", isSent: true, timestamp: "10:31" },
-    ],
+    // 1: [
+    //     { id: "m1", text: "hi !", isSent: false, timestamp: "10:30" },
+    //     { id: "m2", text: "yeah ! massa", isSent: true, timestamp: "10:31" },
+    //     {
+    //         id: "m3",
+    //         text: "Lorem ipsum, dolour sit amet consectetur adipisicing elit. Nulla corporis nemo in sint excepturi aut  !",
+    //         isSent: false,
+    //         timestamp: "10:30",
+    //     },
+    //     {
+    //         id: "m4",
+    //         text: "fugs quia et volupté total, a, commodi quo quae tenetur mollitia sunt suscipit quidem nostrum! ?",
+    //         isSent: true,
+    //         timestamp: "10:31",
+    //     },
+    //     { id: "m5", text: "je m'amuse bien  !", isSent: false, timestamp: "10:30" },
+    //     { id: "m6", text: "moi aussi", isSent: true, timestamp: "10:31" },
+    //     { id: "m7", text: "Salut !", isSent: false, timestamp: "10:30" },
+    //     { id: "m8", text: "Comment ça va ?", isSent: true, timestamp: "10:31" },
+    //     {
+    //         id: "m9",
+    //         text: "Le programme avance bien !",
+    //         image: postedImage,
+    //         isSent: true,
+    //         timestamp: "10:31",
+    //     },
+    //     { id: "m10", text: "Salut !", isSent: false, timestamp: "10:30" },
+    //     { id: "m11", text: "Salut !", isSent: false, timestamp: "10:30" },
+    //     { id: "m12", text: "Comment ça va ?", isSent: true, timestamp: "10:31" },
+    //     {
+    //         id: "m13",
+    //         text: "Le programme avance bien !",
+    //         isSent: true,
+    //         timestamp: "10:31",
+    //     },
+    // ],
+    // 2: [
+    //     { id: "m1", text: "hi !", isSent: false, timestamp: "10:30" },
+    //     { id: "m2", text: "yeah ! massa", isSent: true, timestamp: "10:31" },
+    // ],
+    // 3: [
+    //     { id: "m1", text: "hi !", isSent: false, timestamp: "10:30" },
+    //     { id: "m2", text: "yeah ! massa", isSent: true, timestamp: "10:31" },
+    // ],
+    // 4: [
+    //     { id: "m1", text: "hi !", isSent: false, timestamp: "10:30" },
+    //     { id: "m2", text: "yeah ! massa", isSent: true, timestamp: "10:31" },
+    // ],
 
     // Ajouter d'autres conversations ici
 };
@@ -221,6 +226,7 @@ const ChatScreen = () => {
         discussionId,
         nom,
         profile,
+        logo,
         statut,
         phoneNumber,
         members,
@@ -235,6 +241,7 @@ const ChatScreen = () => {
     const [isMenuVisible, setIsMenuVisible] = useState(false);
     const [menuPosition, setMenuPosition] = useState({ top: 0, right: 0 });
     const [selectedMessage, setSelectedMessage] = useState(null);
+    const date = new Date();
 
     const handleLongPress = (event, message) => {
         const { pageY } = event.nativeEvent;
@@ -261,13 +268,14 @@ const ChatScreen = () => {
 
     // ----------------- Gestion des messages ----------------------- \\
     const renderMessage = ({ item }) =>
+        // Composant d'un message
         item.image ? (
             <TouchableOpacity
                 ref={messageRef}
                 style={[
                     styles.messageContainer,
                     { width: 400, flexDirection: "column", gap: 10, padding: 3, borderRadius: 10, },
-                    item.isSent ? styles.sentMessage : styles.receivedMessage,
+                    item.statut ? styles.sentMessage : styles.receivedMessage,
                 ]}
                 onLongPress={(event) => handleLongPress(event, item)}
                 delayLongPress={500}
@@ -286,14 +294,14 @@ const ChatScreen = () => {
 
                 <Text
                     style={
-                        item.isSent ? [styles.messageSendText, { paddingLeft: 5 }] : styles.messageReceivedText
+                        item.statut ? [styles.messageSendText, { paddingLeft: 5 }] : styles.messageReceivedText
                     }
                 >
                     {item.text}
                 </Text>
                 <Text
                     style={
-                        [item.isSent
+                        [item.statut
                             ? styles.timestampSendText
                             : styles.timestampReceivedText,
                         { paddingRight: 5 }]
@@ -302,36 +310,41 @@ const ChatScreen = () => {
                     {item.timestamp}
                 </Text>
             </TouchableOpacity>
-        ) : (
-            <TouchableOpacity
-                ref={messageRef}
-                style={[
-                    styles.messageContainer,
-                    { padding: 10, borderRadius: 20, },
-                    item.isSent ? styles.sentMessage : styles.receivedMessage,
-                ]}
-                onLongPress={(event) => handleLongPress(event, item)}
-                delayLongPress={500}
-            >
-                <Text
-                    style={
-                        item.isSent ? styles.messageSendText : styles.messageReceivedText
-                    }
-                >
-                    {item.text}
-                </Text>
-                <Text
-                    style={
-                        item.isSent
-                            ? styles.timestampSendText
-                            : styles.timestampReceivedText
-                    }
-                >
-                    {item.timestamp}
-                </Text>
-            </TouchableOpacity>
-        );
 
+        )
+
+            :
+
+            (
+                <TouchableOpacity
+                    ref={messageRef}
+                    style={[
+                        styles.messageContainer,
+                        { padding: 10, borderRadius: 20, },
+                        item.expediteur_id == item.utilisateur_actuel_id ? styles.sentMessage : styles.receivedMessage,
+                    ]}
+                    onLongPress={(event) => handleLongPress(event, item)}
+                    delayLongPress={500}
+                >
+                    <Text
+                        style={
+                            item.expediteur_id == item.utilisateur_actuel_id ? styles.messageSendText : styles.messageReceivedText
+                        }
+                    >
+                        {item.contenu}
+                    </Text>
+                    <Text
+                        style={
+                            item.expediteur_id == item.utilisateur_actuel_id
+                                ? styles.timestampSendText
+                                : styles.timestampReceivedText
+                        }
+                    >
+                        {moment(item.date_envoi).format("HH:mm")}
+                    </Text>
+                </TouchableOpacity>
+
+            );
 
     // ----------------- Gestion de la taille du clavier ----------------------- \\
 
@@ -340,6 +353,12 @@ const ChatScreen = () => {
     const flatListRef = useRef(null);
     const [messages, setMessages] = useState(messagesData[discussionId] || communitiesPublications[communityId] || []); // Initialiser avec les messages de la conversation ou un tableau vide si aucuns messages n'existent
     const messageRef = useRef(null);
+    const socketRef = useRef();
+
+    const [reload, setReload] = useState(0);
+
+    const [isConnected, setIsConnected] = useState(false);
+    const [appState, setAppState] = useState(AppState.currentState);
     /**
      * @brief Effet pour gérer l'apparition et la disparition du clavier
      *
@@ -348,6 +367,27 @@ const ChatScreen = () => {
      */
 
     useEffect(() => {
+        const interval = setTimeout(() => {
+
+            //     if (isConnected && appState == "active") {
+            //console.log("Chargement des messages ...")
+            loadMessages();
+            setReload(reload + 1);
+            //     }
+        }, 2000);
+
+        // On écoute l'état de la connexion internet 
+        const unSubscribeNetInfo = NetInfo.addEventListener((state) => {
+            setIsConnected(state.isConnected);
+        })
+
+        // On écoute l'état de l'application (active/en arrière-plan)
+        const appStateSubscription = AppState.addEventListener("change", (nextAppState) => {
+            setAppState(nextAppState);
+        })
+        // Chargement des messages de la discussion uniquement s'il est connecté et que l'application est ouverte
+
+
         const keyboardDidShowListener = Keyboard.addListener(
             "keyboardDidShow",
             (e) => {
@@ -370,31 +410,50 @@ const ChatScreen = () => {
              */
             keyboardDidShowListener.remove();
             keyboardDidHideListener.remove();
-        };
-    }, []);
 
+            appStateSubscription.remove(); // Suppression de l'abonnement à l'état de l'application
+            unSubscribeNetInfo(); // Suppression de l'abonnement à l'état de la connexion internet
+            clearTimeout(interval); // Suppression de l'intervalle de chargement des messages
+        };
+
+    }, [reload]);
+
+
+    const loadMessages = async () => {
+        const messages = await getMessages(discussionId);
+        //console.log(messages);
+        setMessages(messages);
+    };
     /**
      * Gère la logique d'envoi d'un message.
      *
      * Aucune valeur de retour, met à jour l'état inputText.
      */
-    const handleSendMessage = () => {
-        // Logique d'envoi de message à implémenter 
-        if (inputText.trim()) {
-            // la fonction trim() Vérifie que le TextInput de caractères n'est pas vide
+    const handleSendMessage = async () => {
+
+
+
+        if (inputText.trim()) {  // Si le champ de texte n'est pas vide
+            // Créer un nouveau message localement
             const newMessage = {
-                // Créer un nouveau message
-                id: `m${messages.length + 1}`, // id du nouveau message le 'm' permet d'avoir un identifiant unique à chaque nouveau message
-                text: inputText,
-                isSent: true,
-                timestamp: new Date().toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                }), // Obtenir l'heure et la minute actuelle ; le paramètre '2-digit' permet d'avoir 2 chiffres au maximum
+                id: `m${messages.length + 1}`,
+                contenu: inputText,
+                isSent: true, // Marquer comme non encore envoyé
+                date_envoi: new Date().toISOString(),
             };
-            setMessages([...messages, newMessage]); // Ajouter le nouveau message à la liste des messages; ...messages permet d'ajouter le nouveau message à la liste existante via le spread (...) pour travailler sur une copie de la liste
+
+            await sendMessage(discussionId, inputText);
+
+            // Ajouter le message à la liste localement
+
+            setMessages([...messages, newMessage]);
+
+            // Envoyer le message au serveur via Socket.IO
+
+
+            // Réinitialiser l'inputText et faire défiler vers le bas
             setInputText("");
-            flatListRef.current?.scrollToEnd({ animated: true }); // Scroll vers le bas de l'écran ; le '?' permet de s'assurer que flatListRef.current existe avant de l'utiliser
+            flatListRef.current?.scrollToEnd({ animated: true });
         }
     };
 
@@ -476,17 +535,22 @@ const ChatScreen = () => {
                                     name="arrow-back"
                                     size={30}
                                     color={colors.pureWhite}
-                                    onPress={() => navigation.goBack()}
+                                    onPress={() => isCommunity ? navigation.navigate("Messenger") : navigation.navigate("Messenger", { lastMessageFromChat: inputText })}
                                 />
                             </TouchableOpacity>
 
                             {/** Profil image */}
                             <TouchableOpacity style={styles.profileImageContainer}>
-                                {profile ? (
-                                    <Image source={profile} style={styles.profileImage} />
-                                ) : (
-                                    <Image source={placeholderImage} style={styles.profileImage} />
-                                )}
+                                {
+                                    isCommunity ? (
+                                        <Image source={logo ? { uri: logo } : placeholderGroup} style={styles.profileImage} />
+                                    )
+                                        :
+                                        profile ? (
+                                            <Image source={{ uri: profile }} style={styles.profileImage} />
+                                        ) : (
+                                            <Image source={placeholderImage} style={styles.profileImage} />
+                                        )}
                                 {/** Indicateur de  Statut du contact ou de la Communauté*/}
                                 {isCommunity ? (
                                     // Icône de certification de communauté

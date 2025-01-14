@@ -36,7 +36,7 @@ const UserProfileScreen = () => {
             {/** Photo de profil, nom et numéro */}
             <View style={styles.infosContainer}>
                 <View>
-                    {profil ? <Image source={profil} style={styles.profilImage} />
+                    {profil ? <Image source={{ uri: profil }} style={styles.profilImage} />
                         : <Image source={placeholderImage} style={styles.profilImage} />}
                     {/** Indicateur de  Statut du contact */}
                     <View style={[styles.statusIndicator, { backgroundColor: statut === "En ligne" ? colors.statutIndicator : "grey", }]} />

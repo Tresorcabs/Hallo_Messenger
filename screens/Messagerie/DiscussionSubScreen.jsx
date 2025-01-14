@@ -9,9 +9,11 @@ import {
   Pressable,
   Dimensions,
   Platform,
-  Modal
+  Modal,
+  ScrollView,
+  AppState
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
@@ -21,7 +23,7 @@ import placeholderProfile from "../../assets/placeholder_avatar.png";
 import profil1 from "../../assets/profil1.jpg";
 import profil2 from "../../assets/profil2.jpg";
 import profil3 from "../../assets/profil3.jpg";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/Ionicons";
 import discussionsPlaceHolder from "../../assets/New-message-bro.png";
 import { AnimatedFAB } from "react-native-paper";
@@ -31,106 +33,252 @@ import DataContainer from "../../components/DataContainer";
 import ContactList from "../../components/ContactList";
 import AddContactModal from "../../components/AddContactModal";
 import * as Contacts from 'expo-contacts';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useEffect } from 'react';
+import axios from 'axios';
+import UserContactList from "../../components/UserContactList";
+import { getDiscussions, getProfileInfos, getUserContacts } from "../../api/dataServices";
+import moment from "moment/moment";
+import NetInfo from "@react-native-community/netinfo";
+import { UserProfileContext } from "../../Contexts/UserProfileContext";
 
 export default function DiscussionSubScreen() {
   const navigation = useNavigation();
 
-  const discussionsData = [
-    {
-      id: "1",
-      senderProfile: profil1,
-      statut: "En ligne",
-      senderName: "Romy",
-      senderPhone: "+237 654 28 55 30",
-      dernierMessage: "Salut toi ! ",
-      time: "14 : 00",
-    },
-    {
-      id: "2",
-      senderProfile: "",
-      statut: "Hors ligne",
-      senderName: "",
-      senderPhone: "+237 698 24 25 36",
-      dernierMessage:
-        "La marchandise à été vendue avec succès mon chaud on peut dèja se faire plaisir  ! ",
-      time: "13 : 20",
-    },
-    {
-      id: "3",
-      senderProfile: profil3,
-      statut: "Hors ligne",
-      senderName: "Louane",
-      senderPhone: "+237 696 25 25 42",
-      dernierMessage: "Tu es un chef ",
-      time: "13 : 45",
-    },
-    {
-      id: "4",
-      senderProfile: profil2,
-      statut: "En ligne",
-      senderName: "Ariane ",
-      senderPhone: "+237 677 54 12 26",
-      dernierMessage: "Je t'adore",
-      time: "13 : 20",
-    },
-    {
-      id: "5",
-      senderProfile: "",
-      statut: "En ligne",
-      senderName: "Andy",
-      senderPhone: "+237 698 10 46 36",
-      dernierMessage: "Je veux continuer avec kivyMD ",
-      time: "13 : 08",
-    },
-    {
-      id: "6",
-      senderProfile: profil3,
-      statut: "Hors ligne",
-      senderName: "Emilie",
-      senderPhone: "+237 696 20 25 53",
-      dernierMessage: "Salut toi ! ",
-      time: "12 : 45",
-    },
-    {
-      id: "7",
-      senderProfile: profil2,
-      statut: "En ligne",
-      senderName: "",
-      senderPhone: "+237 697 27 23 32",
-      dernierMessage: "La marchandise à été vendue avec succès ! ",
-      time: "11 : 06",
-    },
-    {
-      id: "8",
-      senderProfile: profil1,
-      statut: "Hors ligne",
-      senderName: "Fred",
-      senderPhone: "+237 699 14 22 36",
-      dernierMessage: "Tu es un chef ",
-      time: "10 : 00",
-    },
-    {
-      id: "9",
-      senderProfile: profil3,
-      statut: "En ligne",
-      senderName: "Rose ",
-      senderPhone: "+237 695 34 35 36",
-      dernierMessage: "Je t'adore",
-      time: "09 : 30",
-    },
-    {
-      id: "10",
-      senderProfile: profil2,
-      statut: "En ligne",
-      senderName: "",
-      senderPhone: "+237 653 34 42 36",
-      dernierMessage: "Je veux continuer avec kivyMD ",
-      time: "07 : 08",
-    },
-  ];
-  const DISCUSSION_LENGTH = discussionsData.length;
+  //const discussionsData = [
+  //   {
+  //     id: "1",
+  //     contactProfile: profil1,
+  //     contactStatut: "En ligne",
+  //     contactName: "Romy",
+  //     contactPhone: "+237 654 28 55 30",
+  //     dernierMessage: "Salut toi ! ",
+  //     time: "14 : 00",
+  //   },
+  //   {
+  //     id: "2",
+  //     contactProfile: "",
+  //     contactStatut: "Hors ligne",
+  //     contactName: "",
+  //     contactPhone: "+237 698 24 25 36",
+  //     dernierMessage:
+  //       "La marchandise à été vendue avec succès mon chaud on peut dèja se faire plaisir  ! ",
+  //     time: "13 : 20",
+  //   },
+  //   {
+  //     id: "3",
+  //     contactProfile: profil3,
+  //     contactStatut: "Hors ligne",
+  //     contactName: "Louane",
+  //     contactPhone: "+237 696 25 25 42",
+  //     dernierMessage: "Tu es un chef ",
+  //     time: "13 : 45",
+  //   },
+  //   {
+  //     id: "4",
+  //     contactProfile: profil2,
+  //     contactStatut: "En ligne",
+  //     contactName: "Ariane ",
+  //     contactPhone: "+237 677 54 12 26",
+  //     dernierMessage: "Je t'adore",
+  //     time: "13 : 20",
+  //   },
+  //   {
+  //     id: "5",
+  //     contactProfile: "",
+  //     contactStatut: "En ligne",
+  //     contactName: "Andy",
+  //     contactPhone: "+237 698 10 46 36",
+  //     dernierMessage: "Je veux continuer avec kivyMD ",
+  //     time: "13 : 08",
+  //   },
+  //   {
+  //     id: "6",
+  //     contactProfile: profil3,
+  //     contactStatut: "Hors ligne",
+  //     contactName: "Emilie",
+  //     contactPhone: "+237 696 20 25 53",
+  //     dernierMessage: "Salut toi ! ",
+  //     time: "12 : 45",
+  //   },
+  //   {
+  //     id: "7",
+  //     contactProfile: profil2,
+  //     contactStatut: "En ligne",
+  //     contactName: "",
+  //     contactPhone: "+237 697 27 23 32",
+  //     dernierMessage: "La marchandise à été vendue avec succès ! ",
+  //     time: "11 : 06",
+  //   },
+  //   {
+  //     id: "8",
+  //     contactProfile: profil1,
+  //     contactStatut: "Hors ligne",
+  //     contactName: "Fred",
+  //     contactPhone: "+237 699 14 22 36",
+  //     dernierMessage: "Tu es un chef ",
+  //     time: "10 : 00",
+  //   },
+  //   {
+  //     id: "9",
+  //     contactProfile: profil3,
+  //     contactStatut: "En ligne",
+  //     contactName: "Rose ",
+  //     contactPhone: "+237 695 34 35 36",
+  //     dernierMessage: "Je t'adore",
+  //     time: "09 : 30",
+  //   },
+  //   {
+  //     id: "10",
+  //     contactProfile: profil2,
+  //     contactStatut: "En ligne",
+  //     contactName: "",
+  //     contactPhone: "+237 653 34 42 36",
+  //     dernierMessage: "Je veux continuer avec kivyMD ",
+  //     time: "07 : 08",
+  //   },
+  //];
+  //const DISCUSSION_LENGTH = discussionsData.length;
+
+  const [isConnected, setIsConnected] = useState(false);
+  const [appState, setAppState] = useState(AppState.currentState);
+
+  const getToken = async () => {
+    const token = await AsyncStorage.getItem('authToken');
+    if (!token) {
+      console.log('Token d\'authentification non trouvé');
+      throw new Error('Token d\'authentification non trouvé');
+    }
+    return token;
+  }
+
+  useEffect(() => {
+
+
+    // Requête pour obtenir les informations du profil
+    getProfileInfosData();
+
+    // Charger les discussions depuis le serveur ensuite depuis AsyncStorage si elles existent
+    getDiscussionsData();
+    loadDiscussionsFromStorage();
+
+    //getDiscussionsData();
+
+    // On écoute l'état de la connexion internet 
+    const unSubscribeNetInfo = NetInfo.addEventListener((state) => {
+      setIsConnected(state.isConnected);
+    })
+
+    // On écoute l'état de l'application (active/en arrière-plan)
+    const appStateSubscription = AppState.addEventListener("change", (nextAppState) => {
+      setAppState(nextAppState);
+    })
+
+    //Intervalle de 10 secondes
+    const interval = setInterval(() => {
+      //if (isConnected && appState == "active") {
+      // Requête pour obtenir les discussions si la connexion est active
+      //console.log(" // ------- > [ L'utilisateur est connecté ]; statut connexion : ", isConnected, "; statut application: ", appState);
+      //console.log("Liste de contacts de l'utilisateur : ", userContactsData);
+      //getProfileInfosData();
+      getDiscussionsData();
+      loadDiscussionsFromStorage();
+      //}
+      //else {
+      //console.log(" // ------- > [ L'utilisateur n'est pas connecté ]; statut connexion : ", isConnected, "; statut application: ", appState);
+      loadDiscussionsFromStorage();
+      //}
+    }, 2000);
+
+    // Nettoyage de l'intervalle
+    return () => {
+      appStateSubscription.remove(); // Suppression de l'abonnement à l'état de l'application
+      unSubscribeNetInfo(); // Suppression de l'abonnement à l'état de la connexion internet
+      clearTimeout(interval); // Suppression de l'intervalle de chargement des messages
+    }
+
+    // }, [isConnected, appState]);
+  }, []);
+
+
+  // -------------- Gestion de la messagerie --------------
+
+  const [discussionsData, setDiscussionsData] = useState(null);
+
+
+
+  // Fonction pour récupérer et stocker les discussions
+  const getDiscussionsData = async () => {
+    try {
+      const token = await getToken();
+      if (token) {
+
+        // Récupération des discussions via votre fonction API
+        const data = await getDiscussions();
+
+        // Stockage des données dans l'état local
+        //setDiscussionsData(data);
+
+        // Stockage des données dans AsyncStorage
+        await AsyncStorage.setItem('discussionsData', JSON.stringify(data));
+        //console.log(" // -----> [Discussions provenant de GetDiscussionData] ")
+      }
+    } catch (error) {
+      console.error('Erreur lors de la récupération des discussions:', error);
+    }
+  };
+
+  // Charger les discussions depuis AsyncStorage si elles existent
+  const loadDiscussionsFromStorage = async () => {
+    try {
+      const storedData = await AsyncStorage.getItem('discussionsData');
+      if (storedData) {
+        //console.log('Chargement des discussions depuis AsyncStorage :', JSON.parse(storedData));
+
+        setDiscussionsData(JSON.parse(storedData));
+        //console.log(" // -----> [Discussions provenant de loadDiscussionsFromStorage ] ")
+      }
+    } catch (error) {
+      console.error('Erreur lors du chargement des discussions depuis AsyncStorage:', error);
+    }
+  };
+
+
+  {/** ------------ Gestion de l'accès à la messagerie -------------  */ }
+
+  // A chaque lancement de l'application au niveau de la page home, on vérifie le token stocké dans AsyncStorage en l'envoyant au serveur
+
+
+  const [userProfile, setUserProfile] = useState(null);
+  const [userContactsData, setUserContactData] = useState(null)
+  // On met à jour les information du contexte de l'utilisateur
+  const { userProfileData, updateUserProfileData } = useContext(UserProfileContext);
+
+  const getProfileInfosData = async () => {
+    // On vérifie s'il a un token d'authentification sinon on redirige vers la page de connexion
+    const token = await getToken();
+    if (!token) {
+      navigation.navigate("Login");
+    }
+
+    const data = await getProfileInfos(navigation);
+    setUserProfile(data);
+    updateUserProfileData(data)
+    console.log("Informations du profil (local):", userProfileData);
+
+  }
+
+
+  const getUserContactsData = async () => {
+    const data = await getUserContacts();
+    setUserContactData(data);
+    //console.log("user contacts", userContactsData);
+  };
+
+
 
   const renderItem = ({ item }) => (
+    //console.log(item),
     // Composant d'une discussion
     <View style={{ width: "100%", paddingHorizontal: 10, marginTop: 10 }}>
       {/** ---------------------------------------------------------- */}
@@ -147,12 +295,12 @@ export default function DiscussionSubScreen() {
           overflow: "hidden",
         }}
         onPress={() =>
-          navigation.navigate("ChatScreen", {
+          navigation.replace("ChatScreen", {
             discussionId: item.id,
-            nom: item.senderName,
-            phoneNumber: item.senderPhone,
-            profile: item.senderProfile,
-            statut: item.statut,
+            nom: item.autre_utilisateur.nom,
+            phoneNumber: item.autre_utilisateur.numero_de_telephone,
+            profile: item.autre_utilisateur.photo_de_profil,
+            statut: item.autre_utilisateur.statut,
           })
         }
       >
@@ -161,14 +309,14 @@ export default function DiscussionSubScreen() {
           style={{ width: 60, height: 60, borderRadius: 50 }}
           onPress={() =>
             navigation.navigate("userProfile", {
-              Nom: item.senderName,
-              phoneNumber: item.senderPhone,
-              profil: item.senderProfile,
-              statut: item.statut,
+              Nom: item.autre_utilisateur.nom,
+              phoneNumber: item.autre_utilisateur.numero_de_telephone,
+              profil: item.autre_utilisateur.photo_de_profil,
+              statut: item.autre_utilisateur.statut,
             })
           }
         >
-          {!item.senderProfile ? (
+          {!item.autre_utilisateur.photo_de_profil ? (
             <Image
               source={placeholderProfile}
               style={{
@@ -182,7 +330,7 @@ export default function DiscussionSubScreen() {
             />
           ) : (
             <Image
-              source={item.senderProfile}
+              source={{ uri: item.autre_utilisateur.photo_de_profil }}
               style={{
                 width: "100%",
                 height: "100%",
@@ -201,7 +349,7 @@ export default function DiscussionSubScreen() {
               borderColor: colors.statutIndicatorBorder,
               borderWidth: 1.5,
               backgroundColor:
-                item.statut === "En ligne" ? colors.statutIndicator : "grey",
+                item.autre_utilisateur.statut === "En ligne" ? colors.statutIndicator : "grey",
             }}
           />
         </TouchableOpacity>
@@ -211,7 +359,7 @@ export default function DiscussionSubScreen() {
         {/** Sender Name or number */}
         <View className="flex-col w-full gap-2 overflow-x-hidden">
           <Text className="font-semibold text-black" style={{ fontSize: 18 }}>
-            {item.senderName === "" ? item.senderPhone : item.senderName}
+            {item.autre_utilisateur.nom === "" ? item.autre_utilisateur.numero_de_telephone : item.autre_utilisateur.nom + " " + item.autre_utilisateur.prenom}
           </Text>
 
           {/** Message */}
@@ -220,9 +368,13 @@ export default function DiscussionSubScreen() {
               className="font-light text-black overflow-x-clip"
               style={{ maxWidth: "70%" }}
             >
-              {item.dernierMessage.length > 40
-                ? item.dernierMessage.substring(0, 40) + "..."
-                : item.dernierMessage}
+              {item.dernier_message.id_expediteur == item.utilisateur_actuel.id ?
+                <Text className="font-normal text-black">Vous :   </Text>
+                : null}
+
+              {item.dernier_message.contenu?.length > 40
+                ? item.dernier_message.contenu.substring(0, 40) + "..." // only first 40 characters
+                : item.dernier_message.contenu}
             </Text>
           </View>
           {/** Time */}
@@ -230,7 +382,9 @@ export default function DiscussionSubScreen() {
             className="text-black font-extralight"
             style={{ position: "absolute", right: 100, fontSize: 12 }}
           >
-            {item.time}
+            { // formatted date
+              moment(item.dernier_message.date_envoi).format("HH:mm")
+            }
           </Text>
         </View>
       </TouchableOpacity>
@@ -239,7 +393,7 @@ export default function DiscussionSubScreen() {
 
   const { width } = Dimensions.get("window");
   const flatListRef = React.useRef(null);
-  const { flatLisLength, setFlatListLength } = useState(discussionsData.length);
+  //const { flatListLength, setFlatListLength } = useState(discussionsData.length);
   const [filterBtnIsFocused, setFilterBtnIsFocused] = useState(true);
 
   const filterDiscussion = () => {
@@ -266,6 +420,7 @@ export default function DiscussionSubScreen() {
   // Fonction de création d'une nouvelle discussion
   const newDiscussion = () => {
     setIsContactsModalVisible(true);
+    getUserContactsData();
   };
   const hideContactsModal = () => {
     setIsContactsModalVisible(false);
@@ -286,6 +441,10 @@ export default function DiscussionSubScreen() {
     fetchContacts(); // On refresh la liste des contacts
   }
 
+
+
+
+
   {
     /** ------------ Application Principale -------------  */
   }
@@ -298,15 +457,15 @@ export default function DiscussionSubScreen() {
             {/** Header component */}
 
             <HeaderComponent
-              myProfile={myProfile}
-              avatarSize={32}
+              myProfile={userProfile ? userProfile.photo_de_profil : null}
+              avatarStyle={{ width: 30, height: 30, borderRadius: 50 }}
               headerTextStyle={styles.headerTextStyle}
               headerText="Hallo Messenger"
               headerStyle={[
                 styles.headerStyle,
                 Platform.OS == "ios"
-                  ? { height: "10%", paddingHorizontal: 15, marginTop: "5%" }
-                  : { height: "9%", paddingHorizontal: 15, marginTop: "5%" },
+                  ? { height: "12%", paddingHorizontal: 15, marginTop: "5%" }
+                  : { height: "10%", paddingHorizontal: 15, marginTop: "5%" },
               ]}
               avatarContainerStyle={styles.avatarContainerStyle}
             />
@@ -429,7 +588,7 @@ export default function DiscussionSubScreen() {
                   height: "98%",
                 }}
               >
-                {discussionsData.length == 0 ? (
+                {discussionsData?.length === 0 ? (
                   /** No discussions message */
 
                   <View
@@ -472,9 +631,10 @@ export default function DiscussionSubScreen() {
                           borderRadius: 10,
                           paddingHorizontal: 25,
                           paddingVertical: 20,
-                          backgroundColor: colors.primary_200,
+                          backgroundColor: colors.primary,
                           elevation: 3,
                         }}
+                        onPress={newDiscussion}
                       >
                         <Text
                           className="font-semibold "
@@ -508,18 +668,21 @@ export default function DiscussionSubScreen() {
 
               {/** New discussion Button */}
 
-              <AnimatedFAB
-                icon="plus"
-                label="Nouvelle"
-                animateFrom="right"
-                extended={isExtended}
-                visible={true}
-                iconMode="dynamic"
-                color={colors.secondary_btn_bg}
-                style={styles.fabStyle}
-                customStyle={styles.customStyle}
-                onPress={newDiscussion}
-              />
+              {discussionsData?.length !== 0 ?
+                <AnimatedFAB
+                  icon="plus"
+                  label="Nouvelle"
+                  animateFrom="right"
+                  extended={isExtended}
+                  visible={true}
+                  iconMode="dynamic"
+                  color={colors.secondary_btn_bg}
+                  style={styles.fabStyle}
+                  customStyle={styles.customStyle}
+                  onPress={newDiscussion}
+                />
+                : null
+              }
 
               {/** ---------------------------------------------------------- */}
 
@@ -564,8 +727,32 @@ export default function DiscussionSubScreen() {
                     <Text style={styles.addNewContactButtonText}>Ajouter un contact</Text>
                   </TouchableOpacity>
 
-                  <ContactList />
+                  {/** UserContactList */}
+                  <View style={styles.userContactList}>
+                    <View style={styles.userContactListHeader}>
+                      <Text style={styles.userContactListHeaderText}>Votre liste de contacts</Text>
+                    </View>
 
+                    <View style={styles.userContactListBody}>
+                      {userContactsData ?
+
+                        <UserContactList userContactData={userContactsData} discussionsData={discussionsData} onPress={hideContactsModal} />
+                        :
+                        <View style={styles.noContactsContainer}>
+                          <Text style={{ fontSize: 16, color: colors.pureBlack, fontWeight: "600" }}>Il n'y a encore aucun contact enregistré </Text>
+                        </View>}
+
+                    </View>
+                  </View>
+
+                  <View style={styles.contactList}>
+                    <View style={styles.userContactListHeader}>
+                      <Text style={styles.userContactListHeaderText}>Vos contacts à inviter</Text>
+                    </View>
+
+                    <ContactList />
+
+                  </View>
                 </View>
               </Modal>
 
@@ -658,5 +845,30 @@ const styles = StyleSheet.create({
     fontSize: 24,
     color: colors.pureWhite,
     fontWeight: "bold",
+  },
+  userContactList: {
+    flex: 1,
+    backgroundColor: colors.pureWhite,
+    marginBottom: 20,
+  },
+  contactList: {
+    flex: 1,
+    backgroundColor: colors.pureWhite,
+  },
+  userContactListHeader: {
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+  },
+  userContactListBody: {
+    paddingHorizontal: 20,
+  },
+  userContactListHeaderText: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  noContactsContainer: {
+    height: "80%",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

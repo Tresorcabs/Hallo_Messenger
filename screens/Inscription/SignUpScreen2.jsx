@@ -1,8 +1,7 @@
+import React, { useState, useContext } from 'react';
 import {
   View,
   Text,
-  Button,
-  Image,
   TouchableOpacity,
   TextInput,
   Platform,
@@ -10,28 +9,45 @@ import {
   TouchableWithoutFeedback,
   ScrollView
 } from "react-native";
-import { StatusBar } from "expo-status-bar";
 import Animated, {
   FadeIn,
   FadeInDown,
   FadeInUp,
   FadeOut,
 } from "react-native-reanimated";
-import "react-native-gesture-handler";
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/FontAwesome";
-import React, { useState } from "react";
-import DateTimePicker from "@react-native-community/datetimepicker";
 import RNPickerSelect from "react-native-picker-select";
-import ReactNativePhoneInput from "react-native-phone-input";
 import countryData from "../../components/data/country.json";
 import colors from "../../components/colors";
+import { SignUpContext } from '../../Contexts/SignUpContext';
 
 export default function SignUpScreen2() {
   const [country, setCountry] = useState(null);
   const [countryDialCode, setCountryDialCode] = useState("+ 237 600 000 000");
-  const [phone, setPhone] = useState(null);
-  const [show, setShow] = useState(false);
+  const [phone, setPhone] = useState("");
+  const [errors, setErrors] = useState({});
+
+  const navigation = useNavigation();
+
+
+
+  // On enregistre les données d'inscription partielles dans le contexte
+
+  const { updateSignUpData, signUpData } = useContext(SignUpContext);
+
+  const handleContinue = () => {
+    if (validateFields()) {
+      const step2Data = {
+        pays: country,
+        numero_de_telephone: countryDialCode + phone,
+      }
+      updateSignUpData(step2Data);
+      navigation.navigate("OTP");
+    }
+  };
+
+
 
   const handleCountryChange = (value) => {
     const selectedCountry = countryData.find((c) => c.name === value);
@@ -39,7 +55,14 @@ export default function SignUpScreen2() {
     setCountryDialCode(selectedCountry ? selectedCountry.dial_code : "");
   };
 
-  const navigation = useNavigation();
+  const validateFields = () => {
+    let newErrors = {};
+    if (!country) newErrors.country = "Le pays est requis";
+    if (!phone.trim()) newErrors.phone = "Le numéro de téléphone est requis";
+    // Ajoutez une validation plus poussée pour le numéro de téléphone si nécessaire
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -58,7 +81,6 @@ export default function SignUpScreen2() {
           </Text>
         </Animated.View>
 
-        {/** signUP  Form 2 */}
         <Animated.View
           entering={FadeInDown.delay(250).duration(5000).springify()}
           className="flex-col items-center content-center justify-between w-full pt-16 pb-16 bg-white rounded-l-3xl h-5/6"
@@ -68,13 +90,10 @@ export default function SignUpScreen2() {
             shadowColor: "#000",
           }}
         >
-
           <ScrollView showsVerticalScrollIndicator={false} style={{ width: "95%" }}>
-            {/** Inputs view */}
             <View className="flex-col items-center content-center w-full">
-              {/** country selector */}
               <View
-                className="w-4/5 m-5 border-primary-200 rounded-xl placeholder:text-behind-input"
+                className={`w-4/5 m-5 border-primary-200 rounded-xl placeholder:text-behind-input ${errors.country ? 'border-red-500' : ''}`}
                 style={{ borderWidth: 1 }}
               >
                 <RNPickerSelect
@@ -91,32 +110,33 @@ export default function SignUpScreen2() {
                   }))}
                 />
               </View>
+              {errors.country && <Text className="text-red-500">{errors.country}</Text>}
 
-              {/** Phone Input */}
               <Animated.View
                 entering={FadeInUp.delay(400).duration(1000).springify()}
                 className="items-center content-center w-full "
               >
                 <TextInput
-                  className="w-4/5 p-3 m-5 border-primary-200 rounded-xl placeholder:text-behind-input"
+                  className={`w-4/5 p-3 m-5 border-primary-200 rounded-xl placeholder:text-behind-input ${errors.phone ? 'border-red-500' : ''}`}
                   style={{ borderWidth: 1 }}
-                  placeholder={`${countryDialCode}`}
+                  placeholder={countryDialCode}
                   keyboardType="numeric"
-                ></TextInput>
+                  value={phone}
+                  onChangeText={(text) => setPhone(text)}
+                />
+                {errors.phone && <Text className="text-red-500">{errors.phone}</Text>}
               </Animated.View>
             </View>
-
           </ScrollView>
-          {/** Action Buttons */}
+
           <View className="flex items-center content-center justify-center w-full h-1/3">
-            {/** Action Buttons : vérifier mon numéro*/}
             <Animated.View
               entering={FadeInUp.delay(250).duration(1000).springify()}
               className="items-center justify-center w-full pl-8 pr-8 "
             >
               <TouchableOpacity
                 className="w-4/5 p-3 m-5 bg-primary rounded-xl"
-                onPress={() => navigation.navigate("OTP")}
+                onPress={handleContinue}
               >
                 <Text className="font-bold text-center text-white">
                   Vérifier mon numéro{" "}

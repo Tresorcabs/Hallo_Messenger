@@ -11,37 +11,28 @@ import {
 } from 'react-native';
 import * as Contacts from 'expo-contacts';
 import colors from './colors';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { addContact } from '../api/dataServices';
 
 const AddContactModal = ({ visible, onClose, onAdd }) => {
-    const [givenName, setGivenName] = useState('');
-    const [familyName, setFamilyName] = useState('');
+    // const [givenName, setGivenName] = useState('');
+    // const [familyName, setFamilyName] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
 
     const handleAddContact = async () => {
-        if (!givenName || !familyName || !phoneNumber) {
+        if (!phoneNumber) {
             Alert.alert('Erreur', 'Tous les champs sont requis.');
             return;
         }
 
-        try {
-            await Contacts.addContactAsync({
-                [Contacts.Fields.FirstName]: givenName,
-                [Contacts.Fields.LastName]: familyName,
-                [Contacts.Fields.PhoneNumbers]: [{ number: phoneNumber }],
-            });
-            Alert.alert('Succès', 'Contact ajouté avec succès.');
-            onAdd();
-            clearForm();
-            onClose();
-        } catch (error) {
-            Alert.alert('Erreur', 'Impossible d\'ajouter le contact.');
-            console.error(error);
-        }
+        const response = await addContact(phoneNumber);
+        console.log(response);
     };
 
     const clearForm = () => {
-        setGivenName('');
-        setFamilyName('');
+        // setGivenName('');
+        // setFamilyName('');
         setPhoneNumber('');
     };
 
@@ -56,8 +47,8 @@ const AddContactModal = ({ visible, onClose, onAdd }) => {
         >
             <View style={styles.overlay}>
                 <View style={styles.modalContainer}>
-                    <Text style={styles.title}>Ajouter un Contact</Text>
-                    <TextInput
+                    <Text style={styles.title}>Ajouter un Contact à la liste</Text>
+                    {/* <TextInput
                         style={styles.input}
                         placeholder="Prénom"
                         value={givenName}
@@ -68,7 +59,7 @@ const AddContactModal = ({ visible, onClose, onAdd }) => {
                         placeholder="Nom"
                         value={familyName}
                         onChangeText={setFamilyName}
-                    />
+                    /> */}
                     <TextInput
                         style={styles.input}
                         placeholder="Numéro de téléphone"
@@ -76,6 +67,10 @@ const AddContactModal = ({ visible, onClose, onAdd }) => {
                         onChangeText={setPhoneNumber}
                         keyboardType="phone-pad"
                     />
+
+                    <Text style={styles.noteText} >
+                        NB : Le contact dois être inscrit !
+                    </Text>
                     <View style={styles.buttonsContainer}>
                         <TouchableOpacity style={styles.revokeButton} onPress={onClose} >
                             <Text style={styles.buttonText}>Annuler</Text>
@@ -113,7 +108,7 @@ const styles = StyleSheet.create({
     input: {
         borderBottomWidth: 0.7,
         borderBottomColor: colors.primary_bold,
-        marginBottom: 15,
+        marginBottom: 25,
         padding: 8,
         fontSize: 16,
     },
@@ -136,6 +131,9 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
     },
+    noteText: {
+        marginBottom: 20
+    }
 });
 
 export default AddContactModal;

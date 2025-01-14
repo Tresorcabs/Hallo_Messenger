@@ -41,7 +41,7 @@ export const Contact = memo(({ contact }) => {
                     <Text style={styles.nameText}>{firstName} {lastName}</Text>
                 </View>
                 <View style={styles.phone}>
-                    <Text style={styles.phoneText}>Faire un coucou 👋</Text>
+                    <Text style={styles.phoneText}>Ce contact n'est pas sur Hallo.       invitez-le !</Text>
                 </View>
             </View>
         </TouchableOpacity>

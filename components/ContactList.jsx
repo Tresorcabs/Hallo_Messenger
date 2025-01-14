@@ -36,6 +36,10 @@ export default function ContactList() {
         return <Contact contact={item} />;
     };
 
+    const renderUserContactDataItem = ({ item }) => {
+        return <Contact contact={item} />;
+    };
+
 
     return (
         <FlatList

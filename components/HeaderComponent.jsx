@@ -1,9 +1,11 @@
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native'
 import React from 'react'
-import CustomSettingButton from './CustomSettingButton'
-import { Avatar } from 'react-native-paper';
+import CustomSettingButton from './CustomSettingButton';
+import placeHolderImage from '../assets/placeholder_avatar.png';
 
-export default function HeaderComponent({ myProfile, avatarSize, avatarContainerStyle, headerStyle, headerTextStyle, headerText, }) {
+export default function HeaderComponent({ myProfile, avatarStyle, avatarContainerStyle, headerStyle, headerTextStyle, headerText, }) {
+
+
     return (
 
         /** Header */
@@ -18,9 +20,13 @@ export default function HeaderComponent({ myProfile, avatarSize, avatarContainer
                 {/** My Profil image */}
                 {myProfile ?
                     <TouchableOpacity>
-                        <Avatar.Image size={avatarSize} source={myProfile} />
+                        <Image style={avatarStyle} source={{ uri: myProfile }} />
                     </TouchableOpacity>
-                    : null}
+                    :
+                    <TouchableOpacity>
+                        <Image style={avatarStyle} source={placeHolderImage} />
+                    </TouchableOpacity>
+                }
 
 
                 {/** Settings button */}

@@ -1,6 +1,7 @@
 import { View, Text, Button, Image, TouchableOpacity } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import Animated, { FadeIn, FadeInDown, FadeInUp, FadeOut } from 'react-native-reanimated';
+
 import 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -10,6 +11,9 @@ import logo from '../assets/logo.png';
 export default function HomeScreen() {
 
     const navigation = useNavigation();
+
+
+
     return (
 
         <View className="flex-col items-center w-full h-full bg-white">

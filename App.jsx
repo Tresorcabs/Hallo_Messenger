@@ -14,16 +14,29 @@ import ChatScreen from './screens/Messagerie/AdvancedScreens/ChatScreen';
 import UserProfileScreen from './screens/Messagerie/AdvancedScreens/UserProfileScreen';
 import FilePreview from "./screens/Messagerie/AdvancedScreens/FilePreview";
 import { EntrepriseDataProvider } from './Contexts/EntrepriseDataContext';
+import { SignUpProvider } from "./Contexts/SignUpContext"
+import { UserProfileProvider } from './Contexts/UserProfileContext';
+import CertifyAccountForm from './screens/Entreprise/subScreens/CertifyAccountForm';
+import CreateEntrepriseScreen from './screens/Entreprise/subScreens/CreateEntrepriseScreen';
+import { Provider as PaperProvider } from 'react-native-paper';
+import WaitingForInvitation from './screens/Entreprise/subScreens/WaitingForInvitation';
+import ProjectDetailsScreen from './screens/Entreprise/subScreens/ProjectDetailsScreen';
 
 const Stack = createNativeStackNavigator();
 
 function App() {
   return (
-    <EntrepriseDataProvider>
-      <NavigationContainer>
-        <RootNavigator />
-      </NavigationContainer>
-    </EntrepriseDataProvider>
+    <PaperProvider>
+      <UserProfileProvider>
+        <SignUpProvider>
+          <EntrepriseDataProvider>
+            <NavigationContainer>
+              <RootNavigator />
+            </NavigationContainer>
+          </EntrepriseDataProvider>
+        </SignUpProvider>
+      </UserProfileProvider>
+    </PaperProvider>
   );
 }
 
@@ -44,6 +57,11 @@ const RootNavigator = () => {
       <Stack.Screen name='userProfile' component={UserProfileScreen} />
 
       <Stack.Screen name="FilePreview" component={FilePreview} />
+
+      <Stack.Screen name="CertifyAccountForm" component={CertifyAccountForm} />
+      <Stack.Screen name="CreateEnterpriseScreen" component={CreateEntrepriseScreen} />
+      <Stack.Screen name='WaitingForInvitation' component={WaitingForInvitation} />
+      <Stack.Screen name="ProjectDetailsScreen" component={ProjectDetailsScreen} />
     </Stack.Navigator>
   );
 }
