@@ -10,15 +10,15 @@ import { View, Text, TouchableOpacity } from 'react-native';
 import { Badge } from 'react-native-paper';
 import { UserProfileContext } from '../../Contexts/UserProfileContext';
 import Carousel from 'react-native-reanimated-carousel';
-import certificationImage from '../../assets/Certification-bro.png';
-import collabImage from '../../assets/Collab.png';
+//import certificationImage from '../../assets/Certification-bro.png';
+//import collabImage from '../../assets/Collab.png';
 import welcomeImage from '../../assets/welcome.png';
 import workImage from '../../assets/Work.png';
 import businessImage from '../../assets/Business.png';
 import benefitImage from '../../assets/Benefits.png';
-import { certifyAccount } from '../../api/dataServices';
+//import { certifyAccount } from '../../api/dataServices';
 import { useNavigation } from '@react-navigation/native';
-import { checkEnterpriseMembership, checkServerConnection, getEnterpriseData, getEnterpriseMembers } from '../../EntrepriseApi/EntrepriseDataService';
+import { checkEnterpriseMembership, checkServerConnection, getEnterpriseData } from '../../EntrepriseApi/EntrepriseDataService';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import MemberTaskList from './MemberTaskList';
@@ -80,6 +80,7 @@ const EnterpriseScreen = () => {
     const response = await checkServerConnection();
     if (response === 200) {
       setIsConnectedToServer(true);
+      console.log("isConnectedToServer : " + isConnectedToServer);
     }
     else {
       setIsConnectedToServer(false);
@@ -136,9 +137,11 @@ const EnterpriseScreen = () => {
     });
   };
 
-  const [certified, setCertified] = React.useState(null);
+  //const [certified, setCertified] = React.useState(null);
 
   const handleStart = () => {
+    console.log("UserProfileData : " + userProfileData);
+
     if (userProfileData.est_certifie !== false && userProfileData.est_certifie !== null) {
       navigation.navigate('CreateEnterpriseScreen');
     }

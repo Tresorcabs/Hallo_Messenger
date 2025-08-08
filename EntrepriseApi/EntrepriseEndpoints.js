@@ -1,5 +1,5 @@
-export const ENTERPRISE_API_URL = "http://10.241.13.150:5001/"
-export const ENTERPRISE_SOCKET_URL = "http://10.241.13.150:5001/"
+export const ENTERPRISE_API_URL = "http://172.20.218.150:5001/"
+export const ENTERPRISE_SOCKET_URL = "http://172.20.218.150:5001/"
 export const CREATE_ENTREPRISE = "create-enterprise"
 export const INVITE_MEMBER = "invite-member"
 export const CREATE_PROJECT = "create-project/1"

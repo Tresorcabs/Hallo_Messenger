@@ -1,5 +1,5 @@
-export const API_URL = "http://10.241.13.150:5000/"
-export const SOCKET_URL = "http://10.241.13.150:5000/"
+export const API_URL = "http://0.0.0.0:5000/"
+export const SOCKET_URL = "http://0.0.0.0:5000/"
 export const SIGNUP = "inscription"
 export const LOGIN = "connexion"
 export const CERTIFY_ACCOUNT = "certifier_compte"
