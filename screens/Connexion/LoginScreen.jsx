@@ -1,153 +1,143 @@
 import React, { useState } from 'react';
-import { View, Text, Button, Image, TouchableOpacity, TextInput, Keyboard, TouchableWithoutFeedback, StyleSheet, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, Keyboard, TouchableWithoutFeedback, StyleSheet, Alert, Modal, ActivityIndicator } from 'react-native';
 import Animated, { FadeInUp, FadeInDown } from 'react-native-reanimated';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import RNPickerSelect from 'react-native-picker-select';
 import colors from '../../components/colors';
 import countryData from '../../components/data/country.json';
 import { StatusBar } from 'expo-status-bar';
-import { HelperText } from 'react-native-paper';
 import { login } from '../../api/dataServices';
 
 export default function LoginScreen() {
     const navigation = useNavigation();
-    const [dialCode, setDialCode] = useState(null);
+    const [dialCode, setDialCode] = useState('+237'); // Default au Cameroun
     const [phoneNumber, setPhoneNumber] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
 
-    const [errors, setErrors] = useState({});
-    const [apiError, setApiError] = useState(null);
-    const [isHelperTextVisible, setIsHelperTextVisible] = useState(false);
+    const [isLoading, setIsLoading] = useState(false); // État pour le chargement
 
     const handleLogin = async () => {
-        // Réinitialiser les erreurs
-        setErrors({});
-        setApiError(null);
-
         // Validation locale des champs
-        let newErrors = {};
-        if (!phoneNumber) newErrors.phoneNumber = 'Le numéro de téléphone est requis';
-        if (!username) newErrors.username = "Le nom d'utilisateur est requis";
-        if (!password) newErrors.password = 'Le mot de passe est requis';
-
-        // Si des erreurs sont présentes, on les affiche
-        if (Object.keys(newErrors).length > 0) {
-            setErrors(newErrors);
+        if (!phoneNumber || !username || !password) {
+            Alert.alert("Champs incomplets", "Veuillez remplir tous les champs pour vous connecter.");
             return;
         }
 
-        // Fonction appel de la fonction dataService pour la Connexion
-        const fullPhoneNumber = `${dialCode}${phoneNumber}`;
-        const response = await login(username, password, fullPhoneNumber, navigation);
-        setApiError(response);
-    };
+        setIsLoading(true); // Activer le chargement
+        try {
+            const fullPhoneNumber = `${dialCode}${phoneNumber}`;
+            const error = await login(username, password, fullPhoneNumber, navigation);
 
+            if (error) {
+                Alert.alert("Erreur de connexion", error);
+            }
+            // Si la connexion réussit, la navigation est déjà gérée dans la fonction `login`
+        } catch (e) {
+            // Erreur inattendue
+            console.error(e);
+            Alert.alert("Erreur inattendue", "Une erreur s'est produite. Veuillez réessayer.");
+        } finally {
+            setIsLoading(false); // Désactiver le chargement
+        }
+    };
 
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <View style={styles.container}>
+                {/* Modal de chargement */}
+                <Modal
+                    transparent={true}
+                    animationType="none"
+                    visible={isLoading}
+                    onRequestClose={() => {}}>
+                    <View style={styles.modalBackground}>
+                        <View style={styles.activityIndicatorWrapper}>
+                            <ActivityIndicator animating={isLoading} size="large" color={colors.primary} />
+                            <Text style={styles.loadingText}>Connexion en cours...</Text>
+                        </View>
+                    </View>
+                </Modal>
 
-            <View className="flex-col items-center w-full h-full bg-primary">
-                <Animated.View entering={FadeInUp.delay(150).duration(1000).springify()} className="flex-row items-center content-center w-full h-1/6" style={{ gap: 10, marginBottom: 5, marginTop: 5, paddingHorizontal: 10, }}>
-                    <TouchableOpacity onPress={() => navigation.goBack()} style={{ paddingLeft: 10, }}>
-                        <Icon name="arrow-left" size={20} color="white" onPress={() => navigation.goBack()} />
+                <Animated.View entering={FadeInUp.delay(150).duration(1000).springify()} style={styles.header}>
+                    <TouchableOpacity onPress={() => navigation.goBack()} style={{ paddingLeft: 10 }}>
+                        <Icon name="arrow-left" size={20} color="white" />
                     </TouchableOpacity>
-                    <Text className="text-2xl font-bold text-white">Connexion à mon compte</Text>
+                    <Text style={styles.headerText}>Connexion à mon compte</Text>
                 </Animated.View>
-
 
                 <StatusBar style='light' />
 
-                {/** Login form */}
-                <Animated.View entering={FadeInDown.delay(250).duration(5000).springify()} className="flex-col items-center content-center w-full pt-16 bg-white rounded-l-3xl h-5/6" style={{ borderTopLeftRadius: 70, borderTopRightRadius: 70, shadowColor: "#000" }}>
-
-                    {/** Affichage des erreurs API */}
-                    {apiError && (
-                        <Animated.View entering={FadeInUp.delay(250).duration(2000).springify()} style={{ width: "80%", height: 30, borderColor: colors.redAlert, borderLeftWidth: 15, borderWidth: 1, borderRadius: 8, textAlign: 'center', alignItems: 'center', justifyContent: 'center', marginBottom: 10 }}>
-                            <HelperText type="error" visible={true} >
-                                {apiError}
-                            </HelperText>
-                        </Animated.View>
-                    )}
-
-                    {/** Inputs View */}
-
-                    <View className="flex-col w-full pb-14">
-                        <Animated.View entering={FadeInUp.delay(200).duration(1000).springify()} className="flex-row items-center justify-center w-full">
-                            <View className={`absolute mr-5 left-11 rounded-tl-xl rounded-bl-xl border-r-primary-200 ${errors.dialCode ? "border-r-red-500" : "border-r-primary-200"}`} style={{ width: 138, borderRightWidth: 1, zIndex: 100 }}>
+                <Animated.View entering={FadeInDown.delay(250).duration(5000).springify()} style={styles.formContainer}>
+                    <View style={styles.inputsView}>
+                        {/* Phone Number Input */}
+                        <Animated.View entering={FadeInUp.delay(200).duration(1000).springify()} style={styles.inputContainer}>
+                            <View style={styles.pickerContainer}>
                                 <RNPickerSelect
-                                    placeholder={{ label: '+237', value: '+237', color: colors.behind_input }}
+                                    placeholder={{}}
+                                    value={dialCode}
                                     onValueChange={(value) => setDialCode(value)}
                                     items={countryData.map((country) => ({
                                         label: `${country.flag}  ${country.dial_code}`,
                                         key: country.code,
                                         value: country.dial_code
                                     }))}
+                                    style={{ inputIOS: styles.pickerInput, inputAndroid: styles.pickerInput }}
                                 />
                             </View>
                             <TextInput
-                                className={`w-4/5 p-3 m-5 pl-36 border-primary-200 rounded-xl placeholder:text-behind-input ${errors.phoneNumber ? 'border-red-500' : ''}`}
-                                style={styles.input}
+                                style={[styles.input, { paddingLeft: 110 }]}
                                 placeholder="Numéro de téléphone"
                                 keyboardType='numeric'
-                                onChangeText={(text) => setPhoneNumber(text)}
+                                onChangeText={setPhoneNumber}
                                 value={phoneNumber}
+                                editable={!isLoading}
                             />
                         </Animated.View>
-                        {errors.phoneNumber && <Text className="ml-12 text-red-500">{errors.phoneNumber}</Text>}
 
-                        {/** Username input */}
-                        <Animated.View entering={FadeInUp.delay(400).duration(1000).springify()} className="items-center content-center w-full ">
+                        {/* Username Input */}
+                        <Animated.View entering={FadeInUp.delay(400).duration(1000).springify()} style={styles.inputContainer}>
                             <TextInput
-                                className={`w-4/5 p-3 m-5 border-primary-200 rounded-xl placeholder:text-behind-input ${errors.username ? 'border-red-500' : ''}`}
                                 style={styles.input}
                                 placeholder="Nom d'utilisateur"
-                                onChangeText={(text) => setUsername(text)}
+                                onChangeText={setUsername}
                                 value={username}
+                                editable={!isLoading}
                             />
                         </Animated.View>
-                        {errors.username && <Text className="ml-12 text-red-500">{errors.username}</Text>}
 
-                        <Animated.View entering={FadeInUp.delay(600).duration(1000).springify()} className="flex-col items-center content-center justify-center w-full ">
+                        {/* Password Input */}
+                        <Animated.View entering={FadeInUp.delay(600).duration(1000).springify()} style={styles.inputContainer}>
                             <TextInput
-                                className={`w-4/5 p-3 m-5 border-primary-200 rounded-xl placeholder:text-behind-input ${errors.password ? 'border-red-500' : ''}`}
                                 style={styles.input}
                                 placeholder="Mot de passe"
                                 secureTextEntry={!showPassword}
-                                onChangeText={(text) => setPassword(text)}
+                                onChangeText={setPassword}
                                 value={password}
+                                editable={!isLoading}
                             />
-                            <Icon
-                                style={{ position: 'absolute', right: 60 }}
-                                name={showPassword ? "eye-slash" : "eye"}
-                                size={20}
-                                color={colors.primary}
-                                onPress={() => setShowPassword(!showPassword)}
-                            />
+                            <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
+                                <Icon name={showPassword ? "eye-slash" : "eye"} size={20} color={colors.primary} />
+                            </TouchableOpacity>
                         </Animated.View>
-                        {errors.password && <Text className="ml-12 text-red-500">{errors.password}</Text>}
                     </View>
 
-                    <View className="flex items-center content-center justify-center w-full h-1/3">
-                        <Animated.View entering={FadeInUp.delay(250).duration(1000).springify()} className="items-center justify-center w-full pl-8 pr-8 ">
-                            <TouchableOpacity className="w-full p-3 m-5 bg-primary rounded-xl" onPress={handleLogin}>
-                                <Text className="font-bold text-center text-white">Connexion          <Icon name="arrow-right" size={15} color="white" /></Text>
+                    <View style={styles.buttonSection}>
+                        <Animated.View entering={FadeInUp.delay(250).duration(1000).springify()} style={styles.fullWidth}>
+                            <TouchableOpacity style={[styles.button, styles.primaryButton, isLoading && styles.disabledButton]} onPress={handleLogin} disabled={isLoading}>
+                                <Text style={styles.primaryButtonText}>Connexion <Icon name="arrow-right" size={15} color="white" /></Text>
                             </TouchableOpacity>
                         </Animated.View>
 
-                        <Animated.View entering={FadeInUp.delay(450).duration(1000).springify()} className="flex-row gap-2 pt-5 pb-5">
-                            <Text className="opacity-50 text-primary-200">--------------------------------------</Text>
-                            <Text className="opacity-50 text-primary-200">Pas encore de compte ?</Text>
-                            <Text className="opacity-50 text-primary-200">---------------------------------------</Text>
+                        <Animated.View entering={FadeInUp.delay(450).duration(1000).springify()} style={styles.dividerContainer}>
+                            <Text style={styles.dividerText}>---------------- Pas encore de compte ? ----------------</Text>
                         </Animated.View>
 
-                        <Animated.View entering={FadeInUp.delay(650).duration(1000).springify()} className="items-center justify-center w-full pl-8 pr-8 ">
-                            <TouchableOpacity className="w-full p-3 m-5 bg-secondary-btn-bg rounded-xl" onPress={() => navigation.navigate('SignUp1')}>
-                                <Text className="font-bold text-center text-primary-bold">S'inscrire        <Icon name="arrow-right" size={15} color="#106C52" /></Text>
+                        <Animated.View entering={FadeInUp.delay(650).duration(1000).springify()} style={styles.fullWidth}>
+                            <TouchableOpacity style={[styles.button, styles.secondaryButton]} onPress={() => navigation.navigate('SignUp1')}>
+                                <Text style={styles.secondaryButtonText}>S'inscrire <Icon name="arrow-right" size={15} color="#106C52" /></Text>
                             </TouchableOpacity>
                         </Animated.View>
                     </View>
@@ -157,9 +147,29 @@ export default function LoginScreen() {
     );
 }
 
+// J'ai remplacé les classes Tailwind par des styles StyleSheet pour plus de clarté et de performance
 const styles = StyleSheet.create({
-    input: {
-        fontSize: 15,
-        borderWidth: 1
-    }
+    container: { flex: 1, backgroundColor: colors.primary },
+    header: { flexDirection: 'row', alignItems: 'center', height: '16.66%', paddingHorizontal: 10, gap: 10 },
+    headerText: { fontSize: 24, fontWeight: 'bold', color: 'white' },
+    formContainer: { flex: 1, backgroundColor: 'white', borderTopLeftRadius: 70, borderTopRightRadius: 70, alignItems: 'center', paddingTop: 40 },
+    inputsView: { width: '100%', alignItems: 'center', paddingBottom: 20 },
+    inputContainer: { width: '80%', marginVertical: 10 },
+    input: { borderWidth: 1, borderColor: colors.primary_200, borderRadius: 12, padding: 12, fontSize: 15 },
+    pickerContainer: { position: 'absolute', left: 10, top: 13, zIndex: 1, borderRightWidth: 1, borderRightColor: colors.primary_200, paddingRight: 10 },
+    pickerInput: { color: colors.primary_bold, width: 80 },
+    eyeIcon: { position: 'absolute', right: 15, top: 15 },
+    buttonSection: { width: '100%', alignItems: 'center', paddingHorizontal: 32 },
+    fullWidth: { width: '100%' },
+    button: { width: '100%', padding: 15, borderRadius: 12, marginVertical: 10, alignItems: 'center' },
+    primaryButton: { backgroundColor: colors.primary },
+    primaryButtonText: { color: 'white', fontWeight: 'bold' },
+    secondaryButton: { backgroundColor: colors.secondary_btn_bg },
+    secondaryButtonText: { color: colors.primary_bold, fontWeight: 'bold' },
+    disabledButton: { opacity: 0.5 },
+    dividerContainer: { paddingVertical: 20 },
+    dividerText: { color: colors.primary_200, opacity: 0.5 },
+    modalBackground: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)' },
+    activityIndicatorWrapper: { backgroundColor: '#FFFFFF', height: 120, width: 200, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' },
+    loadingText: { marginTop: 10, color: colors.primary }
 });

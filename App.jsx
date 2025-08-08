@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
+import { navigationRef } from './navigation/RootNavigation';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from './screens/HomeScreen';
 import LoginScreen from './screens/Connexion/LoginScreen';
@@ -16,6 +17,7 @@ import FilePreview from "./screens/Messagerie/AdvancedScreens/FilePreview";
 import { EntrepriseDataProvider } from './Contexts/EntrepriseDataContext';
 import { SignUpProvider } from "./Contexts/SignUpContext"
 import { UserProfileProvider } from './Contexts/UserProfileContext';
+import { SocketProvider } from './Contexts/SocketContext';
 import CertifyAccountForm from './screens/Entreprise/subScreens/CertifyAccountForm';
 import CreateEntrepriseScreen from './screens/Entreprise/subScreens/CreateEntrepriseScreen';
 import { Provider as PaperProvider } from 'react-native-paper';
@@ -30,9 +32,11 @@ function App() {
       <UserProfileProvider>
         <SignUpProvider>
           <EntrepriseDataProvider>
-            <NavigationContainer>
-              <RootNavigator />
-            </NavigationContainer>
+            <SocketProvider>
+              <NavigationContainer ref={navigationRef}>
+                <RootNavigator />
+              </NavigationContainer>
+            </SocketProvider>
           </EntrepriseDataProvider>
         </SignUpProvider>
       </UserProfileProvider>

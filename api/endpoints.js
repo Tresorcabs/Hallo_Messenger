@@ -1,5 +1,6 @@
-export const API_URL = "http://0.0.0.0:5000/"
-export const SOCKET_URL = "http://0.0.0.0:5000/"
+import { API_URL, SOCKET_URL } from "../config/apiConfig";
+
+export { API_URL, SOCKET_URL };
 export const SIGNUP = "inscription"
 export const LOGIN = "connexion"
 export const CERTIFY_ACCOUNT = "certifier_compte"

@@ -1,0 +1,14 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<CustomDivider /> renders correctly with given text and creates a snapshot 1`] = `
+<View>
+  <Text>
+
+    My Divider
+
+  </Text>
+  <View
+    testID="mock-divider"
+  />
+</View>
+`;
