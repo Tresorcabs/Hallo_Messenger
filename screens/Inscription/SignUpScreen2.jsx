@@ -8,7 +8,8 @@ import {
   Platform,
   Keyboard,
   TouchableWithoutFeedback,
-  ScrollView
+  ScrollView,
+  Alert
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import Animated, {
@@ -18,7 +19,7 @@ import Animated, {
   FadeOut,
 } from "react-native-reanimated";
 import "react-native-gesture-handler";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import React, { useState } from "react";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -28,10 +29,13 @@ import countryData from "../../components/data/country.json";
 import colors from "../../components/colors";
 
 export default function SignUpScreen2() {
+  const navigation = useNavigation();
+  const route = useRoute();
+  const { name, secondName, date, gender } = route.params;
+
   const [country, setCountry] = useState(null);
   const [countryDialCode, setCountryDialCode] = useState("+ 237 600 000 000");
-  const [phone, setPhone] = useState(null);
-  const [show, setShow] = useState(false);
+  const [phone, setPhone] = useState('');
 
   const handleCountryChange = (value) => {
     const selectedCountry = countryData.find((c) => c.name === value);
@@ -39,7 +43,22 @@ export default function SignUpScreen2() {
     setCountryDialCode(selectedCountry ? selectedCountry.dial_code : "");
   };
 
-  const navigation = useNavigation();
+  const handleNext = () => {
+    if (!country || !phone) {
+      Alert.alert("Erreur", "Veuillez sélectionner un pays et entrer un numéro de téléphone.");
+      return;
+    }
+    // Simuler l'envoi d'un OTP
+    console.log("Requesting OTP for:", phone);
+    navigation.navigate("OTP", {
+      name,
+      secondName,
+      date,
+      gender,
+      country,
+      phone
+    });
+  };
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -102,6 +121,8 @@ export default function SignUpScreen2() {
                   style={{ borderWidth: 1 }}
                   placeholder={`${countryDialCode}`}
                   keyboardType="numeric"
+                  value={phone}
+                  onChangeText={setPhone}
                 ></TextInput>
               </Animated.View>
             </View>
@@ -116,7 +137,7 @@ export default function SignUpScreen2() {
             >
               <TouchableOpacity
                 className="w-4/5 p-3 m-5 bg-primary rounded-xl"
-                onPress={() => navigation.navigate("OTP")}
+                onPress={handleNext}
               >
                 <Text className="font-bold text-center text-white">
                   Vérifier mon numéro{" "}

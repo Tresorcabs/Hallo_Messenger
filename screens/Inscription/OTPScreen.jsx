@@ -1,15 +1,18 @@
-import { View, Text, TouchableOpacity, TextInput, StyleSheet, Keyboard, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, StyleSheet, Keyboard, TouchableWithoutFeedback, Alert, ActivityIndicator } from 'react-native';
 import Animated, { FadeIn, FadeInDown, FadeInUp, FadeOut } from 'react-native-reanimated';
 import 'react-native-gesture-handler';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import React, { useState, useRef } from 'react';
-import { input } from '@material-tailwind/react';
+import React, { useState, useRef, useContext } from 'react';
+import { AuthContext } from '../../Contexts/AuthContext';
 
 
 export default function OTPScreen() {
 
     const navigation = useNavigation();
+    const route = useRoute();
+    const { signUp, isSubmitting } = useContext(AuthContext);
+    const { name, secondName, date, gender, country, phone } = route.params;
 
     const [otp, setOtp] = useState(['', '', '', '']);
     const inputs = useRef([]);
@@ -19,26 +22,32 @@ export default function OTPScreen() {
         newOtp[index] = text;
         setOtp(newOtp);
 
-        // Move to next input
-        if (text !== '') {
-            if (index < 3) {
-                inputs.current[index + 1].focus();
-            }
-        }
-
-        // Move to previous input
-        if (text === '') {
-            if (index > 0) {
-                inputs.current[index - 1].focus();
-            }
+        if (text !== '' && index < 3) {
+            inputs.current[index + 1].focus();
         }
     };
-
 
     const handleKeyPress = ({ nativeEvent: { key: keyValue } }, index) => {
         if (keyValue === 'Backspace' && otp[index] === '' && index > 0) {
             inputs.current[index - 1].focus();
         }
+    };
+
+    const handleVerify = () => {
+        const enteredOtp = otp.join('');
+        if (enteredOtp.length < 4) {
+            Alert.alert("Erreur", "Veuillez entrer le code OTP complet.");
+            return;
+        }
+        // Simuler la vérification du OTP et l'inscription
+        console.log("Verifying OTP:", enteredOtp);
+        console.log("User data:", { name, secondName, date, gender, country, phone });
+        signUp();
+    };
+
+    const handleResend = () => {
+        // Simuler la demande d'un nouveau code OTP
+        Alert.alert("Info", "Un nouveau code OTP a été envoyé.");
     };
 
 
@@ -85,7 +94,7 @@ export default function OTPScreen() {
                         {/**OTP code non reçu */}
                         <Animated.View entering={FadeInUp.delay(300).duration(1000).springify()} className="flex flex-row items-center justify-end w-4/5 m-5 font-bold">
                             <Text className="text-primary-200" entering={FadeInUp.delay(300).duration(1000).springify()} style={{ fontSize: 16 }}> Code non reçu ? </Text>
-                            <TouchableOpacity><Text className="text-primary-bold" style={{ fontSize: 16 }}>  Renvoyer</Text></TouchableOpacity>
+                            <TouchableOpacity onPress={handleResend}><Text className="text-primary-bold" style={{ fontSize: 16 }}>  Renvoyer</Text></TouchableOpacity>
                         </Animated.View>
 
                     </View>
@@ -97,8 +106,12 @@ export default function OTPScreen() {
 
                         {/** Action Buttons : Continuer */}
                         <Animated.View entering={FadeInUp.delay(250).duration(1000).springify()} className="items-center justify-center w-full pl-8 pr-8 ">
-                            <TouchableOpacity className="w-4/5 p-3 m-5 bg-primary rounded-xl" onPress={() => navigation.navigate('ProfileScreen')} >
-                                <Text className="font-bold text-center text-white">Vérifier        <Icon name="arrow-right" size={15} color="white" /> </Text>
+                            <TouchableOpacity className="w-4/5 p-3 m-5 bg-primary rounded-xl" onPress={handleVerify} disabled={isSubmitting} >
+                                {isSubmitting ? (
+                                    <ActivityIndicator color="white" />
+                                ) : (
+                                    <Text className="font-bold text-center text-white">Vérifier        <Icon name="arrow-right" size={15} color="white" /> </Text>
+                                )}
                             </TouchableOpacity>
                         </Animated.View>
 

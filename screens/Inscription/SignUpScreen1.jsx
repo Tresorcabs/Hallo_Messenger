@@ -1,4 +1,4 @@
-import { View, Text, Button, Image, TouchableOpacity, TextInput, Platform, TouchableWithoutFeedback, ScrollView } from 'react-native';
+import { View, Text, Button, Image, TouchableOpacity, TextInput, Platform, TouchableWithoutFeedback, ScrollView, Alert } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import Animated, { FadeIn, FadeInDown, FadeInUp, FadeOut } from 'react-native-reanimated';
 import 'react-native-gesture-handler';
@@ -14,13 +14,10 @@ import { Keyboard } from 'react-native';
 export default function SignUpScreen1() {
 
     const [date, setDate] = useState(new Date());
-    const [open, setOpen] = useState(false);
     const [formattedDate, setFormattedDate] = useState('__ __ / __ __ / __ __ __ __');
-    const [name, setName] = useState(null);
-    const [secondName, setSecondName] = useState(null);
-    const [country, setCountry] = useState(null);
+    const [name, setName] = useState('');
+    const [secondName, setSecondName] = useState('');
     const [gender, setGender] = useState(null);
-    const [phone, setPhone] = useState(null);
     const [show, setShow] = useState(false);
 
     const onChange = (event, selectedDate) => {
@@ -35,9 +32,21 @@ export default function SignUpScreen1() {
         { label: 'Autre', value: 'Autre' },
     ];
 
-    /** Gestion de la validité des champ */
-
     const navigation = useNavigation();
+
+    const handleNext = () => {
+        if (!name || !secondName || !gender) {
+            Alert.alert("Erreur", "Veuillez remplir tous les champs.");
+            return;
+        }
+        // Passer les données à l'écran suivant si nécessaire
+        navigation.navigate('SignUp2', {
+            name,
+            secondName,
+            date,
+            gender
+        });
+    };
 
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -58,12 +67,12 @@ export default function SignUpScreen1() {
                             <View className="flex-row w-4/5 m-5">
                                 {/** Name Input */}
                                 <Animated.View entering={FadeInUp.delay(200).duration(1000).springify()} className="w-1/2">
-                                    <TextInput className="p-3 border-primary-200 rounded-xl placeholder:text-behind-input" placeholder="Nom" style={{ borderWidth: 1, width: "95%" }}></TextInput>
+                                    <TextInput className="p-3 border-primary-200 rounded-xl placeholder:text-behind-input" placeholder="Nom" style={{ borderWidth: 1, width: "95%" }} value={name} onChangeText={setName}></TextInput>
                                 </Animated.View>
 
                                 {/** surname Input */}
                                 <Animated.View entering={FadeInUp.delay(200).duration(1000).springify()} className="w-1/2">
-                                    <TextInput className="p-3 border-primary-200 rounded-xl placeholder:text-behind-input" placeholder="Prénom'" style={{ borderWidth: 1, width: "98%" }} />
+                                    <TextInput className="p-3 border-primary-200 rounded-xl placeholder:text-behind-input" placeholder="Prénom'" style={{ borderWidth: 1, width: "98%" }} value={secondName} onChangeText={setSecondName} />
                                 </Animated.View>
 
                             </View>
@@ -103,7 +112,7 @@ export default function SignUpScreen1() {
 
                         {/** Action Buttons : se connecter*/}
                         <Animated.View entering={FadeInUp.delay(250).duration(1000).springify()} className="items-center justify-center w-full pl-8 pr-8 ">
-                            <TouchableOpacity className="w-4/5 p-3 m-5 bg-primary rounded-xl" onPress={() => navigation.navigate('SignUp2')} >
+                        <TouchableOpacity className="w-4/5 p-3 m-5 bg-primary rounded-xl" onPress={handleNext} >
                                 <Text className="font-bold text-center text-white">Continuer       <Icon name="arrow-right" size={15} color="white" /> </Text>
                             </TouchableOpacity>
                         </Animated.View>

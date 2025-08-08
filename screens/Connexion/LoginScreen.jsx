@@ -1,20 +1,35 @@
-import { View, Text, Button, Image, TouchableOpacity, TextInput, Keyboard, TouchableWithoutFeedback, StyleSheet } from 'react-native';
+import { View, Text, Button, Image, TouchableOpacity, TextInput, Keyboard, TouchableWithoutFeedback, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import Animated, { FadeIn, FadeInDown, FadeInUp, FadeOut } from 'react-native-reanimated';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import colors from '../../components/colors';
 import RNPickerSelect from 'react-native-picker-select';
 import countryData from '../../components/data/country.json'
+import { AuthContext } from '../../Contexts/AuthContext';
 
 export default function LoginScreen() {
 
     const navigation = useNavigation();
+    const { signIn, isSubmitting } = useContext(AuthContext);
 
-    const [ dialCode, setDialCode ] = useState(null)
-    
-    const handleNavigateToHome = () => {
-        navigation.navigate('Home');
+    const [dialCode, setDialCode] = useState(null);
+    const [phoneNumber, setPhoneNumber] = useState('');
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+
+    const handleLogin = () => {
+        if (!phoneNumber || !username || !password) {
+            Alert.alert("Erreur", "Veuillez remplir tous les champs.");
+            return;
+        }
+        // Simuler un appel API et une connexion réussie
+        console.log('Logging in with:', { phoneNumber, username, password });
+        signIn();
+    };
+
+    const handleNavigateToSignUp = () => {
+        navigation.navigate('SignUp1');
     };
 
     const [showPassword, setShowPassword] = useState(false);
@@ -47,17 +62,17 @@ export default function LoginScreen() {
                         }) )}
                         />
                     </View>
-                    <TextInput className="w-4/5 p-3 m-5 pl-36 border-primary-200 rounded-xl placeholder:text-behind-input " style={styles.input} placeholder="Numéro de téléphone" keyboardType='numeric'></TextInput>
+                    <TextInput className="w-4/5 p-3 m-5 pl-36 border-primary-200 rounded-xl placeholder:text-behind-input " style={styles.input} placeholder="Numéro de téléphone" keyboardType='numeric' value={phoneNumber} onChangeText={setPhoneNumber}></TextInput>
                 </Animated.View>
 
                 {/** Login Input */}
                 <Animated.View entering={FadeInUp.delay(400).duration(1000).springify()} className="items-center content-center w-full ">
-                    <TextInput className="w-4/5 p-3 m-5 border-primary-200 rounded-xl placeholder:text-behind-input" style={styles.input} placeholder="Nom d'utilisateur"></TextInput>
+                    <TextInput className="w-4/5 p-3 m-5 border-primary-200 rounded-xl placeholder:text-behind-input" style={styles.input} placeholder="Nom d'utilisateur" value={username} onChangeText={setUsername}></TextInput>
                 </Animated.View>
 
                 {/** Password Input */}
                 <Animated.View entering={FadeInUp.delay(600).duration(1000).springify()} className="flex-col items-center content-center justify-center w-full ">
-                    <TextInput className="w-4/5 p-3 m-5 border-primary-200 rounded-xl placeholder:text-behind-input" style={styles.input} placeholder="Mot de passe" secureTextEntry={!showPassword}>
+                    <TextInput className="w-4/5 p-3 m-5 border-primary-200 rounded-xl placeholder:text-behind-input" style={styles.input} placeholder="Mot de passe" secureTextEntry={!showPassword} value={password} onChangeText={setPassword}>
                     </TextInput>
                     <Icon
                         style={{ position: 'absolute', right: 60 }}
@@ -74,8 +89,12 @@ export default function LoginScreen() {
 
                     {/** Action Buttons : se connecter*/}
                     <Animated.View entering={FadeInUp.delay(250).duration(1000).springify()} className="items-center justify-center w-full pl-8 pr-8 ">
-                        <TouchableOpacity className="w-full p-3 m-5 bg-primary rounded-xl">
-                            <Text className="font-bold text-center text-white">Connexion          <Icon name="arrow-right" size={15} color="white" /> </Text>
+                        <TouchableOpacity className="w-full p-3 m-5 bg-primary rounded-xl" onPress={handleLogin} disabled={isSubmitting}>
+                            {isSubmitting ? (
+                                <ActivityIndicator color="white" />
+                            ) : (
+                                <Text className="font-bold text-center text-white">Connexion          <Icon name="arrow-right" size={15} color="white" /> </Text>
+                            )}
                         </TouchableOpacity>
                     </Animated.View>
 
@@ -88,7 +107,7 @@ export default function LoginScreen() {
 
                     {/** Action Buttons : s'inscrire'*/}
                     <Animated.View entering={FadeInUp.delay(650).duration(1000).springify()} className="items-center justify-center w-full pl-8 pr-8 ">
-                        <TouchableOpacity className="w-full p-3 m-5 bg-secondary-btn-bg rounded-xl" onPress={handleNavigateToHome}>
+                        <TouchableOpacity className="w-full p-3 m-5 bg-secondary-btn-bg rounded-xl" onPress={handleNavigateToSignUp}>
                             <Text className="font-bold text-center text-primary-bold">S'inscrire        <Icon name="arrow-right" size={15} color="#106C52" /></Text>
                         </TouchableOpacity>
                     </Animated.View>
